@@ -1,12 +1,14 @@
 .registration-vehicle-container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 25px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    border: 1px solid #eee; /* Lighter border */
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 25px;
+    margin-top: 100px; /* Added top margin for spacing */
+    height: auto; /* Allow height to adjust based on content */
 }
 
 h1 {
@@ -16,18 +18,10 @@ h1 {
   font-size: 28px;
 }
 
-p{
-    text-align: center;
-    margin-bottom: 20px;
-    color: #555;
-}
-
-.form-section {
-  margin-bottom: 25px;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+p {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #555;
 }
 
 .form-group {
@@ -74,9 +68,7 @@ select:focus {
 .form-footer {
   text-align: left;
   margin-top: 25px;
-  
 }
-
 
 .form-buttons {
   display: flex;
