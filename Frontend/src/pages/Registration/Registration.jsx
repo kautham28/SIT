@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Registration.css';
 
 const Registration = () => {
@@ -8,6 +9,7 @@ const Registration = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
+  const navigate = useNavigate();
 
   const handleSendOtp = () => {
     // Logic to send OTP
@@ -23,6 +25,7 @@ const Registration = () => {
     e.preventDefault();
     // Logic to handle form submission
     console.log({ nic, mobile, otp, firstName, lastName, address });
+    navigate('/registration-vehicle'); // Redirect to RegistrationVehicle page
   };
 
   return (
