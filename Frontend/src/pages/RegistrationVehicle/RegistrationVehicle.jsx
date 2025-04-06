@@ -19,6 +19,7 @@ const RegistrationVehicle = () => {
       chassisNumber,
       fuelType,
     });
+    navigate('/qr'); // Redirect to the QR page
   };
 
   const handleBack = () => {

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const navigate = useNavigate();
 
   const handleSendOtp = () => {
     // Logic to send OTP
@@ -13,6 +15,7 @@ const Login = () => {
 
   const handleLogin = () => {
     // Logic to verify OTP and log in
+    navigate('/qr'); // Redirect to the QR page
   };
 
   return (
