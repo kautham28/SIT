@@ -1,47 +1,65 @@
-.registration-container {
+.form-section {
   width: 100%;
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 20px;
+  padding: 25px;
   font-family: Arial, sans-serif;
   text-align: center;
-  border: 1px solid #ddd;
+  border: 1px solid #eee; /* Lighter border */
   border-radius: 8px;
   background-color: #f9f9f9;
+  margin-bottom: 25px;
+  margin-top: 100px; /* Added top margin for spacing */
+  height: 700px; /* Allow height to adjust based on content */
 }
 
-.registration-container h1 {
-  font-size: 24px;
+.form-section h1 {
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin: 10px 0 20px;
+  padding: 10px;
+  color: #333;
+  width: 100%;
+  text-align: center;
 }
 
-.registration-container p {
+.form-section h2 {
+  text-align: left;
+  margin: 20px 0 15px;
+  color: #444;
+}
+
+.form-section p {
   margin-bottom: 20px;
+  text-align: center;
 }
 
-.registration-container a {
-  color: blue;
+.form-section a {
+  color: #007bff;
   text-decoration: underline;
   cursor: pointer;
 }
 
-form {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.registration-container {
+  overflow: visible;
 }
 
-.form-section {
-  margin-bottom: 20px;
+form {
+  max-width: 800px;
+  margin: 80px auto 40px; /* Increased top margin from 40px to 80px */
+  padding: 30px;
+  background-color: white; /* Changed from #f9f9f9 to white for better contrast */
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center align the form contents */
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* Increased spacing */
   text-align: left;
   display: flex;
   flex-direction: column;
+  width: 100%; /* Ensure full width */
 }
 
 .form-group label {
@@ -85,18 +103,18 @@ form {
 
 .next-button {
   width: 40%;
-  padding: 10px;
+  padding: 12px; /* Slightly larger padding */
   background-color: #ffa500;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
-  margin-left: auto;
-  margin-right: 0;
+  margin: 20px 0 10px auto; /* Align to the right */
   display: block;
 }
 
 .next-button:hover {
   background-color: #cc8400;
 }
+
