@@ -144,17 +144,41 @@
   
   .forgot-password {
     display: block;
+  margin: 1.5rem auto 0 auto; /* This centers it horizontally */
     margin-top: 1.5rem;
     text-align: center;
-    margin-left: 80px;
     color: #003152;
     font-size: 0.875rem;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
     transition: color 0.2s;
+    background: none;
+    border: none;
   }
   
   .forgot-password:hover {
     color: #1D2951;
   }
+
+
+/* Verification code specific styles */
+.resend-text {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: rgba(29, 41, 81, 0.8);
+  font-size: 0.875rem;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #003152;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.resend-button:hover {
+  color: #1D2951;
+}
