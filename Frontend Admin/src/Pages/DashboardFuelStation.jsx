@@ -1,6 +1,5 @@
 import React from 'react';
 import { Fuel, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom'; // Import Link for navigation
 import './DashboardFuelStation.css';
 
 function DashboardFuelStation() {
@@ -13,12 +12,6 @@ function DashboardFuelStation() {
 
   return (
     <div className="container">
-      {/* Navigation buttons */}
-      <div className="button-container">
-        <Link to="/FuelStation" className="nav-button">Fuel Stations Dashboard</Link>
-        <Link to="/OwnerDash" className="nav-button">Vehicle Owner Dashboard</Link>
-      </div>
-
       <div className="dashboard-card">
         <div className="header">
           <div className="icon-container">
