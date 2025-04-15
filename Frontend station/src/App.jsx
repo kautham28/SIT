@@ -7,6 +7,7 @@ import ForgotPassword from "./pages/Forgotpassword"; // ForgotPassword component
 import Register from "./pages/Register"; // Register component
 import StationLogin from "./pages/stationlogin"; // StationLogin component
 import VerifyAccount from "./pages/Verify";   
+import NewPassword from "./pages/New";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<StationLogin />} />
           <Route path="/verify" element={<VerifyAccount />} />
+          <Route path="/new-password" element={<NewPassword />} />
         </Routes>
       </div>
     </Router>
