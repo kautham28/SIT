@@ -1,13 +1,90 @@
 .container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   padding: 40px;
+  position: relative; /* For absolute positioning of profile icon */
+}
+
+.profile-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.profile-icon {
+  background-color: #ffffff; /* Profile icon background color */
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(217, 214, 214, 0.1);
+  border-radius: 8px;
+  width: 150px;
+  padding: 10px;
+  z-index: 10;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px;
+  color: #00796b;
+  text-decoration: none;
+  font-weight: bold;
+  background-color: rgb(255, 255, 255);
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  border: #fdfdfd;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: -50px;
+  height: 70px;
+  width: 450px;
+  gap: 15px;
+}
+
+.nav-button {
+  background-color: #45467c;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+}
+
+.nav-button:hover {
+  background-color: #292155;
 }
 
 .dashboard-card {
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 1000px;
   padding: 24px;
@@ -55,6 +132,7 @@
   border: 1px solid #ddd;
   padding: 12px;
   text-align: left;
+  color: #333;
 }
 
 .dashboard-table th {
