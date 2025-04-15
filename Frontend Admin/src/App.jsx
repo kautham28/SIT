@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../src/Pages/Login';
 import ForgotPassword from '../src/Pages/ForgotPassword';
 
-import VerifyCode from './Pages/VerifyCode';
+
 import DashboardFuelStation from './Pages/DashboardFuelStation';
 import Dashboard from './Pages/OwnerDash';
 
