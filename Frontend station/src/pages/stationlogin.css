@@ -1,0 +1,117 @@
+html, body {
+    margin: 0;
+    height: 100%; /* Ensure full height */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #1D2951 !important; /* Black with transparency */
+    color: #1D2951;
+  }
+    
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      width: 400px;
+      height: 380px;
+      padding: 20px;
+      margin: 0 ; /* Center horizontally */
+      background-color: white; /* Form background color */
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    
+    .login-title {
+      text-align: center;
+      margin-bottom: 10px;
+      color:#1D2951;
+      font-style: bold;
+      margin-top: 1px;
+    }
+    
+    .login-label {
+      
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    
+    .input-container {
+  position: relative;
+  width: 80%;
+  margin: 0 20px 16px; /* Center horizontally and add bottom margin */
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #1D2951;
+  font-size: 18px;
+}
+
+.login-input {
+  padding: 10px 10px 10px 35px; /* Add padding to make space for the icon */
+  border-radius: 5px;
+  width: 100%;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  display: block;
+}
+    
+ 
+    .login-button {
+      padding: 10px;
+      background-color: #1D2951; /* Button color */
+      color: #fff;
+      border: none;
+      width: 80%;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 20px auto 0; /* Center horizontally */
+      display: block; /* Ensure it's treated as a block element */
+    }
+    
+    .login-button:hover {
+      background-color: #003152; /* Hover effect */
+    }
+    
+    .forgot-password-link {
+      margin-top: 0px;
+      text-align: right;
+      color: #007bff;
+     
+      text-decoration: none;
+      font-size: 13px;
+      text-decoration: underline;
+    }
+  
+    .register-link {
+      display: block;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: #007bff;
+      text-decoration: none;
+    }
+    
+    .register-link:hover,
+    .forgot-password-link:hover {
+      text-decoration: underline;
+    }
+
+    .login-icon {
+      font-size: 80px;
+      color: #1D2951;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    
