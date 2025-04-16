@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Login-ForgotPass.css';
+
 
 function VerifyCode() {
     const [verificationCode, setVerificationCode] = useState('');
