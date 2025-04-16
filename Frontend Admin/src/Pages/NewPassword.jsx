@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight } from 'lucide-react';
+import './Login-ForgotPassword.css';
 
 function NewPassword() {
   const [password, setPassword] = useState('');
