@@ -1,0 +1,109 @@
+.registration-vehicle-container {
+    width: 100%;
+    padding: 25px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    border: 1px solid #eee; /* Lighter border */
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 25px;
+    margin-top: 100px; /* Added top margin for spacing */
+    height: auto; /* Allow height to adjust based on content */
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 28px;
+}
+
+p {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+}
+
+.vehicle-number-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.fuel-type-options {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.form-footer {
+  text-align: left;
+  margin-top: 25px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 20px;
+}
+
+.back-button,
+.register-button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.1s;
+  flex: 1;
+}
+
+.back-button {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.back-button:hover {
+  background-color: #e0e0e0;
+}
+
+.register-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.register-button:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+}
