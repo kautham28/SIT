@@ -7,7 +7,7 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     margin-bottom: 25px;
-    margin-top: 100px; /* Added top margin for spacing */
+    margin-top: 120px; /* Adjusted top margin to account for navbar height */
     height: auto; /* Allow height to adjust based on content */
 }
 
