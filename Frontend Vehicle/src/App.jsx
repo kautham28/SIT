@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/Home';
 import Registration from './pages/Registration/Registration';
 import RegistrationVehicle from './pages/RegistrationVehicle/RegistrationVehicle';
 import Login from './pages/Login/Login';
@@ -10,7 +11,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Registration />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Registration />} />
         <Route path="/registration-vehicle" element={<RegistrationVehicle />} />
         <Route path="/login" element={<Login />} />
         <Route path='/qr' element={<QRpage />} />
