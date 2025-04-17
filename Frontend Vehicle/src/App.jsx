@@ -5,11 +5,12 @@ import Registration from './pages/Registration/Registration';
 import RegistrationVehicle from './pages/RegistrationVehicle/RegistrationVehicle';
 import Login from './pages/Login/Login';
 import QRpage from './pages/QRpage/QRpage';
-
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Registration />} />

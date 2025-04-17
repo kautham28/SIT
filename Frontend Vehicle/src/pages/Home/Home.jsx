@@ -34,9 +34,24 @@ const Home = () => {
           track consumption, and manage your vehicles with our state-of-the-art system.
         </p>
         
+        <div className="feature-highlights">
+          <div className="feature">
+            <div className="feature-icon">🚗</div>
+            <div className="feature-text">Manage Multiple Vehicles</div>
+          </div>
+          <div className="feature">
+            <div className="feature-icon">📊</div>
+            <div className="feature-text">Track Fuel Usage</div>
+          </div>
+          <div className="feature">
+            <div className="feature-icon">📱</div>
+            <div className="feature-text">Mobile Access</div>
+          </div>
+        </div>
+        
         <div className="home-buttons">
           <button className="register-button" onClick={handleRegister}>
-            <span>Register</span>
+            <span className="btn-text">Register Now</span>
           </button>
           <button className="login-button" onClick={handleLogin}>
             <span className="btn-icon">→</span>
