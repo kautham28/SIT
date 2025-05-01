@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Login-ForgotPass.css';
+import './Login-ForgotPassword.css';
 
 function Login() {
   const [email, setEmail] = useState('');

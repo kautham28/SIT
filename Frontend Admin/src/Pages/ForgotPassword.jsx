@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { KeyRound, Mail, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Login-ForgotPass.css';
+import './Login-ForgotPassword.css';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -11,6 +11,9 @@ function ForgotPassword() {
     e.preventDefault();
     console.log('Password reset attempt', { email });
     // Here you could send a request to your backend
+    // Store email in sessionStorage for other components
+    sessionStorage.setItem('resetEmail', email);
+    navigate('/verify-code');
   };
 
   return (
@@ -48,7 +51,7 @@ function ForgotPassword() {
 
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/login')}
             className="forgot-password"
           >
             Back to login
