@@ -12,13 +12,13 @@ const vehiclesRouter = require('../fuel-station-backend/routes/vehicles_route.js
 const vehicleFuelTransactionsRouter = require('../fuel-station-backend/routes/vehicle_fuel_transactions_route.js');
 const usersRouter = require('../fuel-station-backend/routes/user_route.js');
 const FuelTransactionRouter = require('../fuel-station-backend/routes/station_fuel_transactions_route.js');
-
+const vehicleCategoryRouter = require('../fuel-station-backend/routes/vehicle_category_route.js');
 
 app.use('/api/vehicles', vehiclesRouter);
 app.use('/api/vehicle_fuel_transactions', vehicleFuelTransactionsRouter);
 app.use('/api/station_fuel_transactions', FuelTransactionRouter);
 app.use('/api/users', usersRouter);
-
+app.use('/api/vehicle_categories', vehicleCategoryRouter);
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
