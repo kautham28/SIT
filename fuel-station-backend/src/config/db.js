@@ -1,15 +1,17 @@
+// db.js
 const mysql = require('mysql2');
+require('dotenv').config();  // Load environment variables from .env file
 
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '123456',
-  database: 'Sit_project',
+  host: process.env.DB_HOST,  // Use environment variables
+  user: process.env.DB_USER,  // Use environment variables
+  password: process.env.DB_PASSWORD,  // Use environment variables
+  database: process.env.DB_NAME,  // Use environment variables
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  acquireTimeout: 10000, // Increase timeout for acquiring connection
-  connectTimeout: 10000 // Increase connection timeout
+  acquireTimeout: 10000,
+  connectTimeout: 10000
 });
 
 const db = pool.promise(); // Enable promise-based queries
