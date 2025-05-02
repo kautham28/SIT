@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // Routes
 app.use('/api', userRoutes);
-
+app.use('/api', station_operator_Routes);
 
 // Default route
 app.get('/', (req, res) => {
