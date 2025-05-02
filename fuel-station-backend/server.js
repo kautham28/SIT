@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require("cors");
 require('dotenv').config();
 
+import stationOperatorRoutes from "./routes/station_operator";
 const userRoutes = require('./routes/userRoutes');
 
 
@@ -13,7 +14,7 @@ app.use(bodyParser.json());
 
 // Routes
 app.use('/api', userRoutes);
-app.use('/api', station_operator_Routes);
+app.use('/api/stationOperator', stationOperatorRoutes);
 
 // Default route
 app.get('/', (req, res) => {
