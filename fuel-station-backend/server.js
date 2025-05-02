@@ -3,20 +3,16 @@ const bodyParser = require('body-parser');
 const cors = require("cors");
 require('dotenv').config();
 
-import stationOperatorRoutes from "./routes/station_operator";
-const userRoutes = require('./routes/userRoutes');
-
-
 const app = express();
 app.use(cors());
-// Middleware to parse incoming JSON requests
 app.use(bodyParser.json());
 
 // Routes
-app.use('/api', userRoutes);
-app.use('/api/stationOperator', stationOperatorRoutes);
+const vehiclesRouter = require('../fuel-station-backend/routes/vehicles_route.js');
+const vehicleFuelTransactionsRouter = require('../fuel-station-backend/routes/vehicle_fuel_transactions_route.js');
+app.use('/api/vehicles', vehiclesRouter);
+app.use('/api/vehicle_fuel_transactions', vehicleFuelTransactionsRouter);
 
-// Default route
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
@@ -27,4 +23,7 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-module.exports = app;
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
