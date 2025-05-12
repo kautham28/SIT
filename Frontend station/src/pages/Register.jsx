@@ -9,11 +9,12 @@ import {
   faLock,
   faUser,
   faGasPump,
-  
 } from "@fortawesome/free-solid-svg-icons";
 
 const Register = () => {
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     stationName: "",
     location: "",
     username: "",
@@ -23,15 +24,64 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add registration logic here
-    console.log("Form Data:", formData);
+
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // Validate phone number (must be exactly 10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/fuel_stations/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess("Registration successful! You can now log in.");
+        setError("");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          stationName: "",
+          location: "",
+          username: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+        });
+      } else {
+        setError(data.error || "Registration failed. Please try again.");
+        setSuccess("");
+      }
+    } catch (err) {
+      console.error("Error during registration:", err);
+      setError("An error occurred. Please try again.");
+      setSuccess("");
+    }
   };
 
   return (
@@ -40,7 +90,38 @@ const Register = () => {
         {/* Icon and Heading */}
         <FontAwesomeIcon icon={faUserPlus} className="register-icon" />
         <h2 className="register-title">Create Account</h2>
-        
+
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">{success}</p>}
+
+        {/* First Name Field */}
+        <div className="input-container">
+          <FontAwesomeIcon icon={faUser} className="input-icon" />
+          <input
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="First Name"
+            className="register-input"
+            required
+          />
+        </div>
+
+        {/* Last Name Field */}
+        <div className="input-container">
+          <FontAwesomeIcon icon={faUser} className="input-icon" />
+          <input
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Last Name"
+            className="register-input"
+            required
+          />
+        </div>
+
         {/* Station Name Field */}
         <div className="input-container">
           <FontAwesomeIcon icon={faGasPump} className="input-icon" />
@@ -145,9 +226,11 @@ const Register = () => {
         </button>
 
         {/* Back to Login */}
-<div className="back-to-login">
-  <a href="/" className="login-link">Back to Login</a>
-</div>
+        <div className="back-to-login">
+          <a href="/" className="login-link">
+            Back to Login
+          </a>
+        </div>
       </form>
     </div>
   );
