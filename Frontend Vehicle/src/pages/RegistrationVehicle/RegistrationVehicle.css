@@ -1,14 +1,14 @@
 .registration-vehicle-container {
-    width: 100%;
-    padding: 25px;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    border: 1px solid #eee; /* Lighter border */
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    margin-bottom: 25px;
-    margin-top: 120px; /* Adjusted top margin to account for navbar height */
-    height: auto; /* Allow height to adjust based on content */
+  width: 100%;
+  max-width: 800px;
+  padding: 25px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  border: 1px solid #eee; /* Lighter border */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin: 100px auto 25px; /* Increased top margin to fix navbar overlap */
+  height: auto; /* Allow height to adjust based on content */
 }
 
 h1 {

@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import './Registration.css';
 
 const Registration = () => {
-  const [nic, setNic] = useState('');
   const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
+  const [otp, setOtp] = useState('');
   const navigate = useNavigate();
 
   const handleSendOtp = () => {
@@ -24,25 +23,45 @@ const Registration = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Logic to handle form submission
-    console.log({ nic, mobile, otp, firstName, lastName, address });
+    console.log({ mobile, firstName, lastName, address });
     navigate('/registration-vehicle'); // Redirect to RegistrationVehicle page
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="registration-form">
       <div className="form-section">
-        <h1>REGISTRATION</h1>
-        <p>
+        <h1 className="page-title">REGISTRATION</h1>
+        <p className="login-link">
           Already have an account? <a href="/login">Login Here</a>
         </p>
-        <h2>Personal Details</h2>
+        <h2 className="section-title">Personal Details</h2>
         <div className="form-group">
-          <label>NIC Number *</label>
+          <label>First Name *</label>
           <input
             type="text"
-            value={nic}
-            onChange={(e) => setNic(e.target.value)}
-            placeholder="NIC"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Ex: Saman"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Last Name *</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Ex: Perera"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Address *</label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Ex: 399/8, Station Road, Colombo"
             required
           />
         </div>
@@ -76,40 +95,10 @@ const Registration = () => {
             </button>
           </div>
         </div>
-        <div className="form-group">
-          <label>First Name *</label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Ex: Saman"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Last Name *</label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Ex: Perera"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Address *</label>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Ex: 399/8, Station Road, Colombo"
-            required
-          />
-        </div>
+        <button type="submit" className="next-button">
+          Next
+        </button>
       </div>
-      <button type="submit" className="next-button">
-        Next
-      </button>
     </form>
   );
 };
