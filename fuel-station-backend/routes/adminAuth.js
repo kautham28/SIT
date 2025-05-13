@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // const verifyAdminToken = require('../middleware/adminauthmiddleware');
 
 // Admin login route
-router.post('/admin/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     const { username, password } = req.body;
   
     // Validate input
@@ -61,58 +61,3 @@ router.post('/admin/login', async (req, res) => {
   });
 
   module.exports = router;
-
-// // Protected admin dashboard route
-// router.get('/admin/dashboard', verifyAdminToken, (req, res) => {
-//   res.status(200).json({ 
-//     message: 'Admin dashboard data', 
-//     success: true,
-//     admin: req.admin,
-//     data: {
-//       // Your dashboard data here
-//     }
-//   });
-// });
-
-// // Protected admin profile route
-// router.get('/admin/profile', verifyAdminToken, (req, res) => {
-//   const adminId = req.admin.id;
-  
-//   connection.query(
-//     'SELECT id, username, First_name, Last_name, email, phone_number, role FROM users WHERE id = ?',
-//     [adminId],
-//     (err, results) => {
-//       if (err) {
-//         console.error('Error fetching admin profile:', err);
-//         return res.status(500).json({ 
-//           message: 'Server error fetching profile',
-//           success: false 
-//         });
-//       }
-      
-//       if (results.length === 0) {
-//         return res.status(404).json({ 
-//           message: 'Admin profile not found',
-//           success: false 
-//         });
-//       }
-      
-//       res.status(200).json({
-//         message: 'Admin profile retrieved successfully',
-//         success: true,
-//         profile: results[0]
-//       });
-//     }
-//   );
-// });
-
-// // Admin logout (client-side)
-// router.post('/admin/logout', (req, res) => {
-//   res.status(200).json({ 
-//     message: 'Logout successful',
-//     success: true 
-//   });
-//   // Note: Actual logout is handled on client by removing the token
-// });
-
-
