@@ -16,7 +16,7 @@ const vehicleCategoryRouter = require('../fuel-station-backend/routes/vehicle_ca
 const fuelStationRouter = require('../fuel-station-backend/routes/fuel_stations_route.js');
 const MotorTrafficRouter = require('./routes/motor_traffic_route.js');
 const fuelStationOperatorsRouter = require('../fuel-station-backend/routes/fuel_station_operators.js');
-
+const adminAuth = require('../fuel-station-backend/routes/adminAuth.js');
 
 app.use('/api/vehicles', vehiclesRouter);
 app.use('/api/vehicle_fuel_transactions', vehicleFuelTransactionsRouter);
@@ -26,8 +26,7 @@ app.use('/api/vehicle_categories', vehicleCategoryRouter);
 app.use('/api/fuel_stations', fuelStationRouter);
 app.use('/api/motor_traffic', MotorTrafficRouter);
 app.use('/api/fuel_station_operators', fuelStationOperatorsRouter);
-
-
+app.use('/api/admin_auth', adminAuth);
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
