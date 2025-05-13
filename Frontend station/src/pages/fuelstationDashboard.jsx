@@ -1,31 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./fuelstationDashboard.css";
+import axios from "axios";
 
 const Dashboard = () => {
-  // Example transaction data
-  const transactions = [
-    {
-      transaction_id: 1,
-      vehicle_id: 101,
-      station_id: 1,
-      fuel_amount: 45.25,
-      transaction_date: "2025-04-06 10:30:00",
-    },
-    {
-      transaction_id: 2,
-      vehicle_id: 102,
-      station_id: 1,
-      fuel_amount: 38.5,
-      transaction_date: "2025-04-05 16:45:00",
-    },
-    {
-      transaction_id: 3,
-      vehicle_id: 103,
-      station_id: 2,
-      fuel_amount: 50.0,
-      transaction_date: "2025-04-04 09:15:00",
-    },
-  ];
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Retrieve token from localStorage
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setError("No token found. Please log in.");
+      setLoading(false);
+      return;
+    }
+
+    // Fetch transactions from the backend
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/vehicle_fuel_transactions",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Corrected string interpolation
+            },
+          }
+        );
+        setTransactions(response.data);
+        setLoading(false);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          setError("Unauthorized. Please log in again.");
+          // Optionally redirect to login
+          // window.location.href = "/login";
+        } else if (err.response?.status === 403) {
+          setError("Access denied. Fuel station owner role required.");
+        } else {
+          setError("Failed to fetch transactions: " + err.message);
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="dashboard-container">
@@ -35,28 +63,32 @@ const Dashboard = () => {
 
       <section className="dashboard-content">
         <h2>Vehicle Fuel Transactions</h2>
-        <table className="transaction-table">
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Vehicle ID</th>
-              <th>Station ID</th>
-              <th>Fuel Amount (L)</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx) => (
-              <tr key={tx.transaction_id}>
-                <td>{tx.transaction_id}</td>
-                <td>{tx.vehicle_id}</td>
-                <td>{tx.station_id}</td>
-                <td>{tx.fuel_amount}</td>
-                <td>{tx.transaction_date}</td>
+        {transactions.length === 0 ? (
+          <p>No transactions found for this station.</p>
+        ) : (
+          <table className="transaction-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Vehicle ID</th>
+                <th>Station ID</th>
+                <th>Fuel Amount (L)</th>
+                <th>Date</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {transactions.map((tx) => (
+                <tr key={tx.transaction_id}>
+                  <td>{tx.transaction_id}</td>
+                  <td>{tx.vehicle_id}</td>
+                  <td>{tx.station_id}</td>
+                  <td>{tx.fuel_amount}</td>
+                  <td>{tx.transaction_date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
     </div>
   );
