@@ -8,6 +8,7 @@ const RegistrationVehicle = () => {
   const [vehicleType, setVehicleType] = useState('');
   const [chassisNumber, setChassisNumber] = useState('');
   const [fuelType, setFuelType] = useState('');
+  const [nic, setNic] = useState(''); // New state for NIC
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -18,6 +19,7 @@ const RegistrationVehicle = () => {
       vehicleType,
       chassisNumber,
       fuelType,
+      nic, // Include NIC in submission data
     });
     navigate('/qr'); // Redirect to the QR page
   };
@@ -53,6 +55,16 @@ const RegistrationVehicle = () => {
               required
             />
           </div>
+        </div>
+        <div className="form-group">
+          <label>NIC Number *</label>
+          <input
+            type="text"
+            value={nic}
+            onChange={(e) => setNic(e.target.value)}
+            placeholder="Ex: 982760431V"
+            required
+          />
         </div>
         <div className="form-group">
           <label>Vehicle Type *</label>

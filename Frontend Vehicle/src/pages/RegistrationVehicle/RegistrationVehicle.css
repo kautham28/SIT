@@ -7,8 +7,9 @@
   border: 1px solid #eee; /* Lighter border */
   border-radius: 8px;
   background-color: #f9f9f9;
-  margin: 100px auto 25px; /* Increased top margin to fix navbar overlap */
+  margin: 120px auto 25px; /* Increased top margin from 100px to 120px to prevent navbar overlap */
   height: auto; /* Allow height to adjust based on content */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Added shadow for better visibility */
 }
 
 h1 {
