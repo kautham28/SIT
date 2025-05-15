@@ -4,7 +4,14 @@ const cors = require("cors");
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// Update CORS configuration to allow specific origin
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5173'], // Add your frontend URL(s)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(bodyParser.json());
 
 // Routes
@@ -17,6 +24,7 @@ const fuelStationRouter = require('../fuel-station-backend/routes/fuel_stations_
 const MotorTrafficRouter = require('./routes/motor_traffic_route.js');
 const fuelStationOperatorsRouter = require('../fuel-station-backend/routes/fuel_station_operators.js');
 const adminAuth = require('../fuel-station-backend/routes/adminAuth.js');
+const vehicleRegistrationRouter = require('./routes/vehicle_registration_route.js');
 
 app.use('/api/vehicles', vehiclesRouter);
 app.use('/api/vehicle_fuel_transactions', vehicleFuelTransactionsRouter);
@@ -27,15 +35,29 @@ app.use('/api/fuel_stations', fuelStationRouter);
 app.use('/api/motor_traffic', MotorTrafficRouter);
 app.use('/api/fuel_station_operators', fuelStationOperatorsRouter);
 app.use('/api/admin_auth', adminAuth);
+app.use('/api/vehicle_registration', vehicleRegistrationRouter);
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
-// Error handling middleware
+// Enhanced error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('========= ERROR DETAILS =========');
+  console.error('Error message:', err.message);
+  console.error('Error code:', err.code);
+  console.error('Request path:', req.path);
+  console.error('Request method:', req.method);
+  console.error('Request body:', JSON.stringify(req.body, null, 2));
+  console.error('Stack trace:', err.stack);
+  console.error('=================================');
+  
+  res.status(500).json({
+    error: 'Server error occurred',
+    message: err.message,
+    path: req.path,
+    timestamp: new Date().toISOString()
+  });
 });
 
 const PORT = process.env.PORT || 5000;
