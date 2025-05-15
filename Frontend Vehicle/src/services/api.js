@@ -55,4 +55,19 @@ export const vehicleRegistrationService = {
     API.get('/vehicle_categories')
 };
 
+// Add authentication service for vehicle login
+export const authService = {
+  // Send OTP to the registered mobile for a vehicle
+  sendOTP: (vehicleNumber) => 
+    API.post('/auth/send-otp', { vehicleNumber }),
+  
+  // Verify OTP and authenticate
+  verifyOTP: (vehicleNumber, otp) => 
+    API.post('/auth/verify-otp', { vehicleNumber, otp }),
+    
+  // Get vehicle and user information
+  getVehicleInfo: (vehicleNumber) =>
+    API.get(`/auth/vehicle-info/${vehicleNumber}`)
+};
+
 export default API;

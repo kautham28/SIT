@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
@@ -23,21 +23,21 @@ const Login = () => {
       <h1>LOGIN</h1>
       {!otpSent ? (
         <div className="login-form">
-          <label htmlFor="mobileNumber">Mobile Number *</label>
+          <label htmlFor="vehicleNumber">Vehicle Number *</label>
           <input
             type="text"
-            id="mobileNumber"
-            placeholder="Ex: 0777123456"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
+            id="vehicleNumber"
+            placeholder="Ex: ABC-1234"
+            value={vehicleNumber}
+            onChange={(e) => setVehicleNumber(e.target.value)}
           />
-          <button onClick={handleSendOtp} disabled={!mobileNumber}>
+          <button onClick={handleSendOtp} disabled={!vehicleNumber}>
             Send OTP
           </button>
         </div>
       ) : (
         <div className="otp-form">
-          <p>Enter the 6 digit OTP number sent to mobile {mobileNumber} *</p>
+          <p>Enter the 6 digit OTP number sent to registered mobile for vehicle {vehicleNumber} *</p>
           <input
             type="text"
             placeholder="Enter OTP"
