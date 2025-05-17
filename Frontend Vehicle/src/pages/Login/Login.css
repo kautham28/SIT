@@ -9,19 +9,20 @@ body {
   
   .login-container {
     width: 400px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 100px auto 0; /* Increased top margin to fix navbar overlap */
+    padding: 30px;
     text-align: center;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   }
   
   h1 {
     margin-bottom: 20px;
   }
   
-  .login-form, .otp-form {
+  .login-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -56,4 +57,44 @@ body {
   
   button:not(:disabled):hover {
     background-color: #0056b3;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    margin-bottom: 15px;
+    text-align: left;
+    font-size: 14px;
+  }
+  
+  .forgot-password-link {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .forgot-password-link a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .forgot-password-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+  
+  .back-button {
+    background-color: #6c757d;
+    margin-top: 10px;
+  }
+  
+  .forgot-password-form {
+    width: 100%;
+    max-width: 400px;
   }

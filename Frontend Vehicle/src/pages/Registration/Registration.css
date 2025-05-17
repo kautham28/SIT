@@ -1,119 +1,218 @@
-.form-section {
-    width: 100%;
-    padding: 25px;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    border: 1px solid #eee; /* Lighter border */
-    border-radius: 8px;
-    background-color: white;
-    margin-bottom: 25px;
-    margin-top: 200px; /* Ensure content is displayed below the navbar */
-    height: 700px; /* Allow height to adjust based on content */
-  }
-  
-  .form-section h1 {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 10px 0 20px;
-    padding: 10px;
-    color: #333;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .form-section h2 {
-    text-align: left;
-    margin: 20px 0 15px;
-    color: #444;
-  }
-  
-  .form-section p {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .form-section a {
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  
+:root {
+  --navbar-height: 70px; /* Matches navbar height */
+}
+
+.registration-container {
+  max-width: 800px;
+  margin: calc(var(--navbar-height) + 50px) auto 2rem !important; /* Increased buffer to 50px */
+  padding: 2rem;
+  padding-top: 2.5rem; /* Additional padding to push content down */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - var(--navbar-height) - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+}
+
+.registration-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.step-container {
+  margin-top: 1.5rem;
+  display: block;
+  width: 100%;
+}
+
+.step-container h3 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.mobile-otp-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mobile-otp-container input {
+  flex: 1;
+}
+
+.send-otp-btn {
+  padding: 0.75rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.send-otp-btn:hover {
+  background-color: #45a049;
+}
+
+.send-otp-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.back-btn {
+  padding: 0.75rem 2rem;
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.next-btn,
+.submit-btn {
+  padding: 0.75rem 2rem;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.next-btn:hover,
+.submit-btn:hover {
+  background-color: #0b7dda;
+}
+
+.next-btn:disabled,
+.submit-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c62828;
+  width: 100%;
+  max-width: 600px;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #2e7d32;
+  width: 100%;
+  max-width: 600px;
+}
+
+.review-section {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.review-section h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.review-section p {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
   .registration-container {
-    overflow: visible;
+    margin: calc(var(--navbar-height) + 20px) auto 1rem !important;
+    padding: 1.5rem;
+    padding-top: 2rem;
   }
-  
-  form {
-    max-width: 800px;
-    margin: 80px auto 40px; /* Increased top margin from 40px to 80px */
-    padding: 30px;
-    background-color: white; /* Changed from #f9f9f9 to white for better contrast */
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center align the form contents */
-  }
-  
+
   .form-group {
-    margin-bottom: 20px; /* Increased spacing */
-    text-align: left;
-    display: flex;
+    max-width: 100%;
+  }
+
+  .mobile-otp-container {
     flex-direction: column;
-    width: 100%; /* Ensure full width */
+    gap: 0.75rem;
   }
-  
-  .form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
+
+  .button-group {
+    flex-direction: column-reverse;
+    gap: 1rem;
   }
-  
-  .form-group .input-with-button {
-    display: flex;
-    align-items: center;
-  }
-  
-  .form-group .input-with-button input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-right: 10px;
-  }
-  
-  .form-group input {
+
+  .button-group button {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
-  
-  .form-group button {
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+  .error-message,
+  .success-message,
+  .review-section {
+    max-width: 100%;
   }
-  
-  .form-group button:hover {
-    background-color: #0056b3;
-  }
-  
-  .next-button {
-    width: 40%;
-    padding: 12px; /* Slightly larger padding */
-    background-color: #ffa500;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 20px 0 10px auto; /* Align to the right */
-    display: block;
-  }
-  
-  .next-button:hover {
-    background-color: #cc8400;
-  }
+}
