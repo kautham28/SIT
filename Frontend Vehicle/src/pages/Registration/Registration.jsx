@@ -5,13 +5,15 @@ import './Registration.css';
 
 const Registration = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // Start with step 1
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Form data state
   const [formData, setFormData] = useState({
+    // Personal information
     firstName: '',
     lastName: '',
     nic: '',
@@ -21,21 +23,26 @@ const Registration = () => {
     email: '',
     address: '',
     otp: '',
+    
+    // Vehicle information
     vehicleNumber: '',
     chassisNumber: '',
     vehicleType: '',
     fuelType: ''
   });
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear errors when user types
     setError('');
   };
 
+  // Send OTP
   const handleSendOTP = async (e) => {
     e.preventDefault();
     
@@ -59,6 +66,7 @@ const Registration = () => {
     }
   };
 
+  // Verify OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     
@@ -76,6 +84,7 @@ const Registration = () => {
       
       if (response.success) {
         setSuccess('OTP verified successfully');
+        // Move to the next step
         setStep(2);
       }
     } catch (error) {
@@ -85,6 +94,7 @@ const Registration = () => {
     }
   };
 
+  // Validate vehicle
   const handleValidateVehicle = async (e) => {
     e.preventDefault();
     
@@ -105,11 +115,13 @@ const Registration = () => {
       if (validateResponse.success) {
         setSuccess('Vehicle validated successfully');
         
+        // Proceed with registration directly after validation
         try {
           const response = await vehicleRegistrationService.register(formData);
           
           if (response.success) {
             setSuccess('Registration completed successfully!');
+            // Redirect to success page or dashboard
             setTimeout(() => {
               navigate('/registration-success', { 
                 state: { 
@@ -129,6 +141,8 @@ const Registration = () => {
     }
   };
 
+  console.log("Current step:", step); // Add this to debug which step is active
+
   return (
     <div className="registration-container">
       <h2>Vehicle Registration</h2>
@@ -136,6 +150,7 @@ const Registration = () => {
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
       
+      {/* STEP 1: Personal Information */}
       {step === 1 && (
         <div className="step-container">
           <h3>Step 1: Personal Information</h3>
@@ -273,6 +288,7 @@ const Registration = () => {
         </div>
       )}
       
+      {/* STEP 2: Vehicle Information */}
       {step === 2 && (
         <div className="step-container">
           <h3>Step 2: Vehicle Information</h3>
