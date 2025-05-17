@@ -22,7 +22,7 @@ body {
     margin-bottom: 20px;
   }
   
-  .login-form, .otp-form {
+  .login-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -57,4 +57,11 @@ body {
   
   button:not(:disabled):hover {
     background-color: #0056b3;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    margin-bottom: 15px;
+    text-align: left;
+    font-size: 14px;
   }
