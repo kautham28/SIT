@@ -1,250 +1,218 @@
-/* Merged styles from Registration.css and RegistrationVehicle.css */
-.form-section, .registration-vehicle-container {
-  width: 100%;
-  padding: 25px;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  border: 1px solid #eee; /* Lighter border */
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  margin-bottom: 25px;
-  margin-top: 120px; /* Adjusted top margin to account for navbar height */
-  height: auto; /* Allow height to adjust based on content */
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #333;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-h2 {
-  text-align: left;
-  margin: 20px 0 15px;
-  color: #444;
-}
-
-p {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #555;
-}
-
-a {
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
+:root {
+  --navbar-height: 70px; /* Matches navbar height */
 }
 
 .registration-container {
-  overflow: visible;
-}
-
-form {
   max-width: 800px;
-  margin: 80px auto 40px; /* Increased top margin from 40px to 80px */
-  padding: 30px;
-  background-color: white; /* Changed from #f9f9f9 to white for better contrast */
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin: calc(var(--navbar-height) + 50px) auto 2rem !important; /* Increased buffer to 50px */
+  padding: 2rem;
+  padding-top: 2.5rem; /* Additional padding to push content down */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - var(--navbar-height) - 100px);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center align the form contents */
+  align-items: center;
+  overflow: auto;
+}
+
+.registration-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.step-container {
+  margin-top: 1.5rem;
+  display: block;
+  width: 100%;
+}
+
+.step-container h3 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
 
 .form-group {
-  margin-bottom: 20px; /* Increased spacing */
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  width: 100%; /* Ensure full width */
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 600px;
 }
 
 .form-group label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
 }
 
-.form-group .input-with-button {
-  display: flex;
-  align-items: center;
-}
-
-.form-group .input-with-button input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
-}
-
-input,
-select {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border: 1px solid #ccc;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+  font-size: 1rem;
+  background-color: #fff;
 }
 
-input:focus,
-select:focus {
-  outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
-/* Vehicle number styles */
-.vehicle-number-inputs {
+.mobile-otp-container {
   display: flex;
-  gap: 15px;
-  align-items: center;
+  gap: 0.5rem;
 }
 
-/* Fuel type options */
-.fuel-type-options {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-}
-
-.fuel-type-options label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 20px;
-}
-
-.fuel-type-options input[type="radio"] {
-  width: auto;
-  margin-right: 5px;
-}
-
-.form-group button {
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-group button:hover {
-  background-color: #0056b3;
-}
-
-/* Button styles */
-.next-button {
-  width: 40%;
-  padding: 12px; /* Slightly larger padding */
-  background-color: #ffa500;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 20px 0 10px auto; /* Align to the right */
-  display: block;
-}
-
-.next-button:hover {
-  background-color: #cc8400;
-}
-
-.form-footer {
-  text-align: left;
-  margin-top: 25px;
-}
-
-.form-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-  gap: 20px;
-}
-
-.back-button,
-.register-button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background-color 0.3s, transform 0.1s;
+.mobile-otp-container input {
   flex: 1;
 }
 
-.back-button {
-  background-color: #f0f0f0;
-  color: #555;
-}
-
-.back-button:hover {
-  background-color: #e0e0e0;
-}
-
-.register-button {
+.send-otp-btn {
+  padding: 0.75rem 1rem;
   background-color: #4caf50;
   color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.register-button:hover {
+.send-otp-btn:hover {
   background-color: #45a049;
-  transform: translateY(-1px);
 }
 
-/* Error and success messages */
+.send-otp-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.back-btn {
+  padding: 0.75rem 2rem;
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.next-btn,
+.submit-btn {
+  padding: 0.75rem 2rem;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.next-btn:hover,
+.submit-btn:hover {
+  background-color: #0b7dda;
+}
+
+.next-btn:disabled,
+.submit-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
+}
+
 .error-message {
   background-color: #ffebee;
   color: #c62828;
-  padding: 10px;
+  padding: 0.75rem;
   border-radius: 4px;
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
   border-left: 4px solid #c62828;
+  width: 100%;
+  max-width: 600px;
 }
 
 .success-message {
   background-color: #e8f5e9;
   color: #2e7d32;
-  padding: 10px;
+  padding: 0.75rem;
   border-radius: 4px;
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
   border-left: 4px solid #2e7d32;
+  width: 100%;
+  max-width: 600px;
 }
 
-/* Loading spinner */
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-  font-weight: 500;
-  color: #1976d2;
+.review-section {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
 }
 
-.loading-spinner::before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-  border: 3px solid #1976d2;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.review-section h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.review-section p {
+  margin-bottom: 0.5rem;
 }
 
-/* Disabled button style */
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+@media (max-width: 768px) {
+  .registration-container {
+    margin: calc(var(--navbar-height) + 20px) auto 1rem !important;
+    padding: 1.5rem;
+    padding-top: 2rem;
+  }
+
+  .form-group {
+    max-width: 100%;
+  }
+
+  .mobile-otp-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .button-group {
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+
+  .error-message,
+  .success-message,
+  .review-section {
+    max-width: 100%;
+  }
 }

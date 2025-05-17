@@ -1,400 +1,363 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Registration.css';
 import { vehicleRegistrationService } from '../../services/api';
+import './Registration.css';
 
 const Registration = () => {
-  // Personal details state
-  const [nic, setNic] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [address, setAddress] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  // Add email state since it's being used in handleSubmit
-  const [email, setEmail] = useState('');
-  
-  // Vehicle details state
-  const [vehicleNumberPart1, setVehicleNumberPart1] = useState('');
-  const [vehicleNumberPart2, setVehicleNumberPart2] = useState('');
-  const [vehicleType, setVehicleType] = useState('');
-  const [chassisNumber, setChassisNumber] = useState('');
-  const [fuelType, setFuelType] = useState('');
-  
-  // Add loading and error states
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  
-  const [currentStep, setCurrentStep] = useState(1);
-  
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Add state for vehicle categories
-  const [vehicleCategories, setVehicleCategories] = useState([]);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
-  
-  // Fetch vehicle categories when component mounts
-  useEffect(() => {
-    const fetchVehicleCategories = async () => {
-      setIsCategoriesLoading(true);
-      try {
-        const categories = await vehicleRegistrationService.getVehicleCategories();
-        setVehicleCategories(categories);
-      } catch (err) {
-        console.error('Error fetching vehicle categories:', err);
-        setError('Failed to load vehicle types. Please refresh the page.');
-      } finally {
-        setIsCategoriesLoading(false);
-      }
-    };
-    
-    fetchVehicleCategories();
-  }, []);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    nic: '',
+    password: '',
+    confirmPassword: '',
+    mobile: '',
+    email: '',
+    address: '',
+    otp: '',
+    vehicleNumber: '',
+    chassisNumber: '',
+    vehicleType: '',
+    fuelType: ''
+  });
 
-  const handleSendOtp = () => {
-    // Logic to send OTP
-    console.log('Send OTP to:', mobile);
-    // This is just a placeholder - you would implement real OTP service
-    setSuccess('OTP sent successfully!');
-    setTimeout(() => setSuccess(null), 3000);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError('');
   };
 
-  const handleVerifyOtp = () => {
-    // Logic to verify OTP
-    console.log('Verify OTP:', otp);
-    // This is just a placeholder - you would implement real OTP verification
-    setSuccess('OTP verified!');
-    setTimeout(() => setSuccess(null), 3000);
-  };
-
-  const handleNextStep = (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault();
-    // Basic validation
-    if (password !== confirmPassword) {
-      setError('Passwords do not match!');
+    
+    if (!formData.mobile) {
+      setError('Mobile number is required');
       return;
     }
-    
-    // Basic NIC validation
-    const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12})$/;
-    if (!nicRegex.test(nic)) {
-      setError('Invalid NIC format!');
-      return;
-    }
-    
-    // Clear any previous errors
-    setError(null);
-    // Move to vehicle details section
-    setCurrentStep(2);
-  };
-
-  const handleBack = () => {
-    // Go back to personal details section
-    setCurrentStep(1);
-    setError(null);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
     
     try {
-      // Format vehicle number correctly
-      const formattedVehicleNumber = `${vehicleNumberPart1.trim()}-${vehicleNumberPart2.trim()}`;
+      setLoading(true);
+      const response = await vehicleRegistrationService.sendOtp({ mobile: formData.mobile });
       
-      // Log what we're sending to help with debugging
-      console.log('Submitting registration data:', {
-        personal: { firstName, lastName, nic, mobile, address },
-        vehicle: { vehicleNumber: formattedVehicleNumber, vehicleType, chassisNumber, fuelType }
-      });
-      
-      // Prepare the registration data
-      const registrationData = {
-        firstName,
-        lastName,
-        nic,
-        password,
-        mobile,
-        address,
-        ...(email && { email }),
-        vehicleNumber: formattedVehicleNumber,
-        vehicleType,
-        chassisNumber,
-        fuelType
-      };
-      
-      // Call the API to register
-      const response = await vehicleRegistrationService.register(registrationData);
-      
-      console.log('Registration successful:', response);
-      setSuccess('Registration successful! Redirecting to QR page...');
-      
-      // Redirect after a brief delay to show the success message
-      setTimeout(() => {
-        navigate('/qr', { 
-          state: { 
-            userId: response.userId,
-            vehicleId: response.vehicleId,
-            registrationNumber: response.registrationNumber,
-            fuelQuota: response.fuelQuota
-          } 
-        });
-      }, 2000);
-      
-    } catch (err) {
-      console.error('Registration error:', err);
-      
-      // Show a more user-friendly error message based on the response
-      let errorMessage = 'Failed to register. Please try again.';
-      
-      if (err && err.message) {
-        errorMessage = err.message;
+      if (response.success) {
+        setOtpSent(true);
+        setSuccess('OTP sent successfully. Please check your phone.');
       }
-      
-      setError(errorMessage);
+    } catch (error) {
+      setError(error.message || 'Failed to send OTP');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Display error or success message
-  const renderMessage = () => {
-    if (error) {
-      return <div className="error-message">{error}</div>;
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.otp) {
+      setError('Please enter the OTP');
+      return;
     }
-    if (success) {
-      return <div className="success-message">{success}</div>;
+    
+    try {
+      setLoading(true);
+      const response = await vehicleRegistrationService.verifyOtp({ 
+        mobile: formData.mobile, 
+        otp: formData.otp 
+      });
+      
+      if (response.success) {
+        setSuccess('OTP verified successfully');
+        setStep(2);
+      }
+    } catch (error) {
+      setError(error.message || 'Invalid or expired OTP');
+    } finally {
+      setLoading(false);
     }
-    return null;
+  };
+
+  const handleValidateVehicle = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.vehicleNumber || !formData.chassisNumber) {
+      setError('Vehicle number and chassis number are required');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const validateResponse = await vehicleRegistrationService.validateVehicle({
+        vehicleNumber: formData.vehicleNumber,
+        chassisNumber: formData.chassisNumber,
+        vehicleType: formData.vehicleType,
+        fuelType: formData.fuelType
+      });
+      
+      if (validateResponse.success) {
+        setSuccess('Vehicle validated successfully');
+        
+        try {
+          const response = await vehicleRegistrationService.register(formData);
+          
+          if (response.success) {
+            setSuccess('Registration completed successfully!');
+            setTimeout(() => {
+              navigate('/registration-success', { 
+                state: { 
+                  registrationData: response 
+                }
+              });
+            }, 2000);
+          }
+        } catch (registrationError) {
+          setError(registrationError.message || 'Registration failed');
+        }
+      }
+    } catch (error) {
+      setError(error.message || 'Vehicle validation failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={currentStep === 1 ? handleNextStep : handleSubmit}>
-      {/* Show any error or success messages */}
-      {renderMessage()}
+    <div className="registration-container">
+      <h2>Vehicle Registration</h2>
       
-      {/* Show loading indicator */}
-      {isLoading && <div className="loading-spinner">Processing...</div>}
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
       
-      {currentStep === 1 ? (
-        // Step 1: Personal Details
-        <div className="form-section">
-          <h1>REGISTRATION</h1>
-          <p>
-            Already have an account? <a href="/login">Login Here</a>
-          </p>
-          <h2>Personal Details</h2>
-          <div className="form-group">
-            <label>NIC Number *</label>
-            <input
-              type="text"
-              value={nic}
-              onChange={(e) => setNic(e.target.value)}
-              placeholder="NIC"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>First Name *</label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="Ex: Saman"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Last Name *</label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              placeholder="Ex: Perera"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Address *</label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Ex: 399/8, Station Road, Colombo"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Password *</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Confirm Password *</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Mobile Number *</label>
-            <div className="input-with-button">
+      {step === 1 && (
+        <div className="step-container">
+          <h3>Step 1: Personal Information</h3>
+          <form onSubmit={handleVerifyOTP}>
+            <div className="form-group">
+              <label htmlFor="firstName">First Name*</label>
               <input
                 type="text"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                placeholder="Mobile Number"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
                 required
               />
-              <button type="button" onClick={handleSendOtp}>
-                Send OTP
-              </button>
             </div>
-          </div>
-          <div className="form-group">
-            <label>OTP *</label>
-            <div className="input-with-button">
+            
+            <div className="form-group">
+              <label htmlFor="lastName">Last Name*</label>
               <input
                 type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Ex: 123456"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
                 required
               />
-              <button type="button" onClick={handleVerifyOtp}>
-                Verify
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="nic">NIC Number*</label>
+              <input
+                type="text"
+                id="nic"
+                name="nic"
+                value={formData.nic}
+                onChange={handleChange}
+                placeholder="Format: 123456789V or 123456789012"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="password">Password*</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Confirm Password*</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="mobile">Mobile Number*</label>
+              <div className="mobile-otp-container">
+                <input
+                  type="text"
+                  id="mobile"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="Format: 0771234567 or +94771234567"
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="send-otp-btn"
+                  onClick={handleSendOTP}
+                  disabled={loading || !formData.mobile}
+                >
+                  {loading ? 'Sending...' : 'Send OTP'}
+                </button>
+              </div>
+            </div>
+            
+            {otpSent && (
+              <div className="form-group">
+                <label htmlFor="otp">Enter OTP*</label>
+                <input
+                  type="text"
+                  id="otp"
+                  name="otp"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )}
+            
+            <div className="form-group">
+              <label htmlFor="email">Email (Optional)</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="address">Address*</label>
+              <textarea
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="button-group">
+              <button 
+                type="submit" 
+                className="next-btn"
+                disabled={loading || !otpSent}
+              >
+                {loading ? 'Processing...' : 'Verify & Continue'}
               </button>
             </div>
-          </div>
-          {/* Add email field to the form */}
-          <div className="form-group">
-            <label>Email (Optional)</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your.email@example.com"
-            />
-          </div>
-          <button type="submit" className="next-button">
-            Next
-          </button>
+          </form>
         </div>
-      ) : (
-        // Step 2: Vehicle Details
-        <div className="registration-vehicle-container">
-          <h1>REGISTRATION</h1>
-          <p>
-            Already have an account? <a href="/login">Login Here</a>
-          </p>
-          <h2>Vehicle Details</h2>
-          <div className="form-group">
-            <label>Vehicle Number *</label>
-            <div className="vehicle-number-inputs">
+      )}
+      
+      {step === 2 && (
+        <div className="step-container">
+          <h3>Step 2: Vehicle Information</h3>
+          <form onSubmit={handleValidateVehicle}>
+            <div className="form-group">
+              <label htmlFor="vehicleNumber">Vehicle Registration Number*</label>
               <input
                 type="text"
-                value={vehicleNumberPart1}
-                onChange={(e) => setVehicleNumberPart1(e.target.value)}
-                placeholder="Ex: ABC"
-                required
-              />
-              <input
-                type="text"
-                value={vehicleNumberPart2}
-                onChange={(e) => setVehicleNumberPart2(e.target.value)}
-                placeholder="Ex: 1234"
+                id="vehicleNumber"
+                name="vehicleNumber"
+                value={formData.vehicleNumber}
+                onChange={handleChange}
                 required
               />
             </div>
-          </div>
-          <div className="form-group">
-            <label>Vehicle Type *</label>
-            {isCategoriesLoading ? (
-              <div className="loading-spinner">Loading vehicle types...</div>
-            ) : (
+            
+            <div className="form-group">
+              <label htmlFor="chassisNumber">Chassis Number*</label>
+              <input
+                type="text"
+                id="chassisNumber"
+                name="chassisNumber"
+                value={formData.chassisNumber}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="vehicleType">Vehicle Type*</label>
               <select
-                value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
+                id="vehicleType"
+                name="vehicleType"
+                value={formData.vehicleType}
+                onChange={handleChange}
                 required
               >
-                <option value="" disabled>
-                  Select Type
-                </option>
-                {vehicleCategories.map((category) => (
-                  <option key={category.category_id} value={category.category_name}>
-                    {category.category_name}
-                  </option>
-                ))}
+                <option value="">Select Vehicle Type</option>
+                <option value="Car">Car</option>
+                <option value="Van">Van</option>
+                <option value="SUV">SUV</option>
+                <option value="Bus">Bus</option>
+                <option value="Truck">Truck</option>
+                <option value="Motorcycle">Motorcycle</option>
+                <option value="Three Wheeler">Three Wheeler</option>
               </select>
-            )}
-          </div>
-          <div className="form-group">
-            <label>Chassis Number *</label>
-            <input
-              type="text"
-              value={chassisNumber}
-              onChange={(e) => setChassisNumber(e.target.value)}
-              placeholder="Ex: N786543322"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Select Fuel Type:</label>
-            <div className="fuel-type-options">
-              <label>
-                <input
-                  type="radio"
-                  value="Diesel"
-                  checked={fuelType === 'Diesel'}
-                  onChange={(e) => setFuelType(e.target.value)}
-                />
-                Diesel
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="Petrol"
-                  checked={fuelType === 'Petrol'}
-                  onChange={(e) => setFuelType(e.target.value)}
-                />
-                Petrol
-              </label>
             </div>
-          </div>
-          <div className="form-footer">
-            <div className="form-buttons">
+            
+            <div className="form-group">
+              <label htmlFor="fuelType">Fuel Type*</label>
+              <select
+                id="fuelType"
+                name="fuelType"
+                value={formData.fuelType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Fuel Type</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Super Diesel">Super Diesel</option>
+                <option value="Auto Diesel">Auto Diesel</option>
+              </select>
+            </div>
+            
+            <div className="button-group">
               <button 
                 type="button" 
-                className="back-button" 
-                onClick={handleBack}
-                disabled={isLoading}
+                className="back-btn"
+                onClick={() => setStep(1)}
               >
                 Back
               </button>
               <button 
                 type="submit" 
-                className="register-button"
-                disabled={isLoading}
+                className="next-btn"
+                disabled={loading}
               >
-                {isLoading ? 'Registering...' : 'Register'}
+                {loading ? 'Processing...' : 'Complete Registration'}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
-    </form>
+    </div>
   );
 };
 

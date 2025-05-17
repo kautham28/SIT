@@ -26,6 +26,7 @@ const fuelStationOperatorsRouter = require('../fuel-station-backend/routes/fuel_
 const adminAuth = require('../fuel-station-backend/routes/adminAuth.js');
 const vehicleRegistrationRouter = require('./routes/vehicle_registration_route.js');
 
+
 app.use('/api/vehicles', vehiclesRouter);
 app.use('/api/vehicle_fuel_transactions', vehicleFuelTransactionsRouter);
 app.use('/api/station_fuel_transactions', FuelTransactionRouter);
@@ -60,7 +61,22 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Import the database setup module
+const dbSetup = require('./config/db_setup');
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Run database setup before starting the server
+console.log('Setting up database schema...');
+dbSetup.setupDatabase()
+  .then(() => {
+    console.log('Database schema setup completed successfully');
+    
+    // Start the server after database setup is complete
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Database setup error:', err);
+    process.exit(1); // Exit with error code
+  });

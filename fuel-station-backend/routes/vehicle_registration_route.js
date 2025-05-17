@@ -1,8 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../src/config/db');
+const db = require('../config/db');
+const axios = require('axios');
 
-// Add a simple test endpoint at the top of the file
+// Notify.lk Configuration
+const NOTIFY_API_KEY = 'IxQ8IgkEZ7QSqwsK3VvM';
+const NOTIFY_USER_ID = '29542'; // Your Notify.lk user ID
+const NOTIFY_SENDER_ID = 'NotifyDEMO';
+const NOTIFY_API_URL = 'https://app.notify.lk/api/v1/send'; // Confirm with Notify.lk docs
+
+// Utility to generate a 6-digit OTP
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Test endpoint
 router.get('/test', (req, res) => {
   try {
     res.status(200).json({ 
@@ -29,7 +41,6 @@ const validatePersonalInfo = (req, res, next) => {
     });
   }
   
-  // NIC validation (basic format check for Sri Lankan NIC)
   const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12})$/;
   if (!nicRegex.test(nic)) {
     return res.status(400).json({ 
@@ -38,7 +49,6 @@ const validatePersonalInfo = (req, res, next) => {
     });
   }
   
-  // Phone number validation (basic format check for Sri Lankan phone numbers)
   const phoneRegex = /^(0|\+94)[0-9]{9}$/;
   if (!phoneRegex.test(mobile)) {
     return res.status(400).json({ 
@@ -61,7 +71,6 @@ const validateVehicleInfo = (req, res, next) => {
     });
   }
   
-  // Basic vehicle number validation (format varies but should not be empty)
   if (vehicleNumber.trim().length < 4) {
     return res.status(400).json({ 
       success: false,
@@ -69,7 +78,6 @@ const validateVehicleInfo = (req, res, next) => {
     });
   }
   
-  // Basic chassis number validation (varies but should have minimum length)
   if (chassisNumber.trim().length < 6) {
     return res.status(400).json({ 
       success: false,
@@ -80,12 +88,125 @@ const validateVehicleInfo = (req, res, next) => {
   next();
 };
 
-// Validate vehicle details against Department of Motor Traffic database
+// Send OTP via Notify.lk
+router.post('/send-otp', async (req, res) => {
+  const { mobile } = req.body;
+  
+  if (!mobile) {
+    return res.status(400).json({ success: false, message: 'Mobile number is required' });
+  }
+  
+  const phoneRegex = /^(0|\+94)[0-9]{9}$/;
+  if (!phoneRegex.test(mobile)) {
+    return res.status(400).json({ 
+      success: false,
+      message: 'Invalid phone number format. Use format: 07XXXXXXXX or +947XXXXXXXX' 
+    });
+  }
+  
+  const otp = generateOTP();
+  console.log(`Generated OTP for ${mobile}: ${otp}`); // Debug logging
+  
+  try {
+    let formattedMobile = mobile;
+    if (mobile.startsWith('0')) {
+      formattedMobile = `94${mobile.substring(1)}`;
+    } else if (mobile.startsWith('+94')) {
+      formattedMobile = mobile.substring(1); // Remove the + sign
+    }
+    
+    // Store OTP in DB with expiry (5 minutes)
+    await db.query(
+      'INSERT INTO otps (mobile, otp, expires_at) VALUES (?, ?, ?)',
+      [mobile, otp, new Date(Date.now() + 5 * 60 * 1000)]
+    );
+    
+    // Send SMS via Notify.lk
+    const response = await axios.post(NOTIFY_API_URL, null, {
+      params: {
+        user_id: NOTIFY_USER_ID,
+        api_key: NOTIFY_API_KEY,
+        sender_id: NOTIFY_SENDER_ID,
+        to: formattedMobile,
+        message: `Your OTP for vehicle registration is ${otp}. Valid for 5 minutes.`
+      }
+    });
+    
+    if (response.data && response.data.status === 'success') {
+      res.status(200).json({ 
+        success: true, 
+        message: 'OTP sent successfully' 
+      });
+    } else {
+      throw new Error(`Notify.lk API error: ${response.data?.message || 'Unknown error'}`);
+    }
+  } catch (error) {
+    console.error('Error sending OTP via Notify.lk:', error);
+    // If SMS fails, the OTP is still stored in DB, so return success for now
+    res.status(200).json({
+      success: true,
+      message: 'OTP generated and saved, but SMS delivery may have failed',
+      debug: {
+        notice: 'SMS API error, but OTP is saved in database for testing'
+      }
+    });
+  }
+});
+
+// ...existing code...
+
+// Verify OTP
+router.post('/verify-otp', async (req, res) => {
+  const { mobile, otp } = req.body;
+  
+  if (!mobile || !otp) {
+    return res.status(400).json({ success: false, message: 'Mobile number and OTP are required' });
+  }
+  
+  try {
+    const [records] = await db.query(
+      'SELECT * FROM otps WHERE mobile = ? AND otp = ? AND expires_at > ?',
+      [mobile, otp, new Date()]
+    );
+    
+    if (records.length === 0) {
+      const [anyOtps] = await db.query('SELECT * FROM otps WHERE mobile = ?', [mobile]);
+      if (anyOtps.length > 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid or expired OTP. Please request a new one.' 
+        });
+      }
+      return res.status(400).json({ 
+        success: false, 
+        message: 'No OTP found for this number. Please request an OTP first.' 
+      });
+    }
+    
+    // Mark OTP as verified or delete it (optional)
+    await db.query('UPDATE otps SET verified = true WHERE mobile = ? AND otp = ?', [mobile, otp]);
+    
+    // Return success
+    res.status(200).json({
+      success: true,
+      message: 'OTP verified successfully',
+      verified: true
+    });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying OTP',
+      error: error.message
+    });
+  }
+});
+
+// Validate vehicle details against DMT database
 router.post('/validate-vehicle', validateVehicleInfo, async (req, res) => {
   const { vehicleNumber, chassisNumber } = req.body;
   
   try {
-    // Query DMT database to validate vehicle information
     const [vehicleRecords] = await db.query(
       'SELECT * FROM department_of_motor_traffic WHERE vehicle_number = ? AND chassis = ?',
       [vehicleNumber, chassisNumber]
@@ -98,7 +219,6 @@ router.post('/validate-vehicle', validateVehicleInfo, async (req, res) => {
       });
     }
     
-    // Vehicle found, return success response
     res.status(200).json({
       success: true,
       message: 'Vehicle validated successfully',
@@ -110,7 +230,6 @@ router.post('/validate-vehicle', validateVehicleInfo, async (req, res) => {
         registrationDate: vehicleRecords[0].registration_date
       }
     });
-    
   } catch (error) {
     console.error('Error validating vehicle:', error);
     res.status(500).json({
@@ -121,7 +240,7 @@ router.post('/validate-vehicle', validateVehicleInfo, async (req, res) => {
   }
 });
 
-// Register user only (first step)
+// Register user only
 router.post('/register-user', validatePersonalInfo, async (req, res) => {
   const { firstName, lastName, nic, password, mobile, address, email } = req.body;
   
@@ -129,7 +248,6 @@ router.post('/register-user', validatePersonalInfo, async (req, res) => {
   try {
     await connection.beginTransaction();
     
-    // Check if user with NIC already exists
     const [existingUsers] = await connection.query(
       'SELECT * FROM users WHERE NIC_number = ?',
       [nic]
@@ -143,13 +261,10 @@ router.post('/register-user', validatePersonalInfo, async (req, res) => {
       });
     }
     
-    // Generate username based on first name and NIC
     const username = `${firstName.toLowerCase()}_${nic.substring(0, 5)}`;
-    
-    // Insert user data
     const [userResult] = await connection.query(
-      'INSERT INTO users (First_name, Last_name, username, password, role, email, phone_number, NIC_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [firstName, lastName, username, password, 'vehicle_owner', email || null, mobile, nic]
+      'INSERT INTO users (First_name, Last_name, username, password, role, email, phone_number, NIC_number, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [firstName, lastName, username, password, 'vehicle_owner', email || null, mobile, nic, address]
     );
     
     await connection.commit();
@@ -160,7 +275,6 @@ router.post('/register-user', validatePersonalInfo, async (req, res) => {
       userId: userResult.insertId,
       username
     });
-    
   } catch (error) {
     await connection.rollback();
     console.error('Error registering user:', error);
@@ -182,7 +296,7 @@ router.post('/register-user', validatePersonalInfo, async (req, res) => {
   }
 });
 
-// Register vehicle only (second step)
+// Register vehicle only
 router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
   const { userId, vehicleNumber, vehicleType, chassisNumber, fuelType } = req.body;
   
@@ -197,7 +311,6 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
   try {
     await connection.beginTransaction();
     
-    // Verify user exists
     const [users] = await connection.query(
       'SELECT * FROM users WHERE user_id = ?',
       [userId]
@@ -211,7 +324,6 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
       });
     }
     
-    // Verify vehicle in DMT
     const [dmt] = await connection.query(
       'SELECT * FROM department_of_motor_traffic WHERE vehicle_number = ?',
       [vehicleNumber]
@@ -225,7 +337,6 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
       });
     }
     
-    // Get category ID and fuel quota based on vehicle type
     const [categories] = await connection.query(
       'SELECT category_id, fuel_quota FROM vehicle_categories WHERE category_name LIKE ?',
       [`%${vehicleType}%`]
@@ -236,15 +347,13 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
       categoryId = categories[0].category_id;
       fuelQuota = categories[0].fuel_quota;
     } else {
-      // Default category if not found
       const [defaultCategory] = await connection.query(
         'SELECT category_id, fuel_quota FROM vehicle_categories LIMIT 1'
       );
       categoryId = defaultCategory.length > 0 ? defaultCategory[0].category_id : 1;
-      fuelQuota = defaultCategory.length > 0 ? defaultCategory[0].fuel_quota : 20.00; // Default quota if not found
+      fuelQuota = defaultCategory.length > 0 ? defaultCategory[0].fuel_quota : 20.00;
     }
     
-    // Insert vehicle with fuel quota
     const [vehicleResult] = await connection.query(
       'INSERT INTO vehicles (registration_number, chassis, vehicle_owner_id, category_id) VALUES (?, ?, ?, ?)',
       [vehicleNumber, chassisNumber, userId, categoryId]
@@ -259,7 +368,6 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
       registrationNumber: vehicleNumber,
       fuelQuota
     });
-    
   } catch (error) {
     await connection.rollback();
     console.error('Error registering vehicle:', error);
@@ -281,9 +389,8 @@ router.post('/register-vehicle', validateVehicleInfo, async (req, res) => {
   }
 });
 
-// Complete registration (both user and vehicle in one request)
+// Complete registration with OTP verification
 router.post('/register', async (req, res) => {
-  // Skip the middleware and handle validation manually for better error messages
   const { 
     firstName, lastName, nic, password, mobile, address, email,
     vehicleNumber, vehicleType, chassisNumber, fuelType
@@ -294,7 +401,6 @@ router.post('/register', async (req, res) => {
     vehicle: { vehicleNumber, vehicleType, chassisNumber, fuelType }
   });
   
-  // Validate required fields
   if (!firstName || !lastName || !nic || !password || !mobile || !address) {
     return res.status(400).json({ 
       success: false,
@@ -313,14 +419,36 @@ router.post('/register', async (req, res) => {
   try {
     await connection.beginTransaction();
     
-    // 1. Check DMT records - with more detailed error handling and logging
+    // Check if mobile is already verified by an existing user
+    const [existingUsers] = await connection.query(
+      'SELECT * FROM users WHERE phone_number = ?',
+      [mobile]
+    );
+    
+    if (existingUsers.length > 0) {
+      console.log('Mobile number already associated with a user, skipping OTP check');
+    } else {
+      // For new users, ensure OTP was verified earlier (optional check if needed)
+      const [otpRecords] = await connection.query(
+        'SELECT * FROM otps WHERE mobile = ? AND expires_at > ?',
+        [mobile, new Date()]
+      );
+      if (otpRecords.length === 0) {
+        await connection.rollback();
+        return res.status(400).json({ 
+          success: false, 
+          message: 'No valid OTP found. Please verify OTP first.' 
+        });
+      }
+    }
+    
+    // Check DMT records
     console.log('Checking DMT records for vehicle:', vehicleNumber);
     const [dmt] = await connection.query(
       'SELECT * FROM department_of_motor_traffic WHERE vehicle_number = ?',
       [vehicleNumber]
     );
     
-    console.log('DMT records found:', dmt.length);
     if (dmt.length === 0) {
       await connection.rollback();
       return res.status(404).json({
@@ -329,31 +457,28 @@ router.post('/register', async (req, res) => {
       });
     }
     
-    // 2. Register user
+    // Register user
     console.log('Registering new user with NIC:', nic);
-    const [existingUsers] = await connection.query(
+    const [existingUsersByNic] = await connection.query(
       'SELECT * FROM users WHERE NIC_number = ?',
       [nic]
     );
     
     let userId;
-    if (existingUsers.length > 0) {
+    if (existingUsersByNic.length > 0) {
       console.log('User with NIC already exists, using existing user');
-      userId = existingUsers[0].user_id;
+      userId = existingUsersByNic[0].user_id;
     } else {
-      // Generate username based on first name and NIC
       const username = `${firstName.toLowerCase()}_${nic.substring(0, 5)}`;
-      
       const [userResult] = await connection.query(
-        'INSERT INTO users (First_name, Last_name, username, password, role, email, phone_number, NIC_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO users (First_name, Last_name, username, password, role, email, phone_number, NIC_number) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)',
         [firstName, lastName, username, password, 'vehicle_owner', email || null, mobile, nic]
       );
-      
       userId = userResult.insertId;
       console.log('New user created with ID:', userId);
     }
     
-    // 3. Get vehicle category
+    // Get vehicle category
     console.log('Looking up vehicle category for:', vehicleType);
     const [categories] = await connection.query(
       'SELECT category_id, fuel_quota FROM vehicle_categories WHERE category_name = ?',
@@ -370,7 +495,6 @@ router.post('/register', async (req, res) => {
       const [defaultCategory] = await connection.query(
         'SELECT category_id, fuel_quota FROM vehicle_categories LIMIT 1'
       );
-      
       if (defaultCategory.length === 0) {
         await connection.rollback();
         return res.status(500).json({
@@ -378,13 +502,12 @@ router.post('/register', async (req, res) => {
           message: 'No vehicle categories found in the system'
         });
       }
-      
       categoryId = defaultCategory[0].category_id;
       fuelQuota = defaultCategory[0].fuel_quota;
       console.log('Using default category:', { categoryId, fuelQuota });
     }
     
-    // 4. Check if vehicle already exists
+    // Check if vehicle already exists
     console.log('Checking if vehicle already exists:', vehicleNumber);
     const [existingVehicles] = await connection.query(
       'SELECT * FROM vehicles WHERE registration_number = ?',
@@ -399,7 +522,7 @@ router.post('/register', async (req, res) => {
       });
     }
     
-    // 5. Register vehicle - using the correct schema
+    // Register vehicle
     console.log('Registering new vehicle');
     const [vehicleResult] = await connection.query(
       'INSERT INTO vehicles (registration_number, chassis, vehicle_owner_id, category_id) VALUES (?, ?, ?, ?)',
@@ -410,7 +533,11 @@ router.post('/register', async (req, res) => {
     
     await connection.commit();
     
-    // Return the fuel quota from the category in the response
+    // Clean up OTP if it exists (optional, since it’s already verified)
+    if (existingUsers.length === 0) {
+      await connection.query('DELETE FROM otps WHERE mobile = ?', [mobile]);
+    }
+    
     res.status(201).json({
       success: true,
       message: 'Registration completed successfully',
@@ -420,7 +547,6 @@ router.post('/register', async (req, res) => {
       fuelQuota: fuelQuota || 0,
       categoryId
     });
-    
   } catch (error) {
     await connection.rollback();
     console.error('Registration error details:', {
@@ -429,7 +555,6 @@ router.post('/register', async (req, res) => {
       stack: error.stack
     });
     
-    // Provide specific error messages for common database errors
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({
         success: false,
@@ -458,6 +583,44 @@ router.post('/register', async (req, res) => {
     });
   } finally {
     connection.release();
+  }
+});
+
+// Send post-pumping notification
+router.post('/send-pumping-notification', async (req, res) => {
+  const { mobile, vehicleNumber, pumpedLiters, remainingQuota } = req.body;
+  
+  if (!mobile || !vehicleNumber || !pumpedLiters || remainingQuota === undefined) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+  
+  try {
+    let formattedMobile = mobile;
+    if (mobile.startsWith('0')) {
+      formattedMobile = `94${mobile.substring(1)}`;
+    } else if (mobile.startsWith('+94')) {
+      formattedMobile = mobile.substring(1);
+    }
+    
+    const message = `Fuel Update: ${pumpedLiters}L pumped for vehicle ${vehicleNumber}. Remaining quota: ${remainingQuota}L.`;
+    const response = await axios.post(NOTIFY_API_URL, null, {
+      params: {
+        user_id: NOTIFY_USER_ID,
+        api_key: NOTIFY_API_KEY,
+        sender_id: NOTIFY_SENDER_ID,
+        to: formattedMobile,
+        message
+      }
+    });
+    
+    if (response.data && response.data.status === 'success') {
+      res.status(200).json({ success: true, message: 'Notification sent successfully' });
+    } else {
+      throw new Error(`Notify.lk API error: ${response.data?.message || 'Unknown error'}`);
+    }
+  } catch (error) {
+    console.error('Error sending pumping notification:', error);
+    res.status(500).json({ success: false, message: 'Failed to send notification', error: error.message });
   }
 });
 

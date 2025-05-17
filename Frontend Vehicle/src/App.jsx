@@ -5,6 +5,7 @@ import Registration from './pages/Registration/Registration';
 import Login from './pages/Login/Login';
 import QRpage from './pages/QRpage/QRpage';
 import Navbar from './components/Navbar';
+import RegistrationSuccess from './pages/Registration/RegistrationSuccess';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path='/qr' element={<QRpage />} />
         <Route path="*" element={<h2>Page Not Found</h2>} />
+        <Route path="/registration-success" element={<RegistrationSuccess />} />
       </Routes>
     </Router>
   );

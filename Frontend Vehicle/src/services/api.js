@@ -52,7 +52,15 @@ export const vehicleRegistrationService = {
 
   // Get all vehicle categories
   getVehicleCategories: () => 
-    API.get('/vehicle_categories')
+    API.get('/vehicle_categories'),
+
+  // Send OTP to the mobile number
+  sendOtp: (data) => 
+    API.post('/vehicle_registration/send-otp', data),
+
+  // Verify OTP for the mobile number
+  verifyOtp: (data) => 
+    API.post('/vehicle_registration/verify-otp', data),
 };
 
 // Add authentication service for vehicle login
