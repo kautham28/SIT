@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Fuel, MapPin, User, Edit, Trash2, Plus, Search } from 'lucide-react';
+import { Fuel, MapPin, User, Edit, Trash2, Plus, Search, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './DashboardFuelStation.css';
 
@@ -13,7 +13,11 @@ function DashboardFuelStation() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [currentStation, setCurrentStation] = useState(null);
+  
+  // Search states
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchColumn, setSearchColumn] = useState('all');
+  const [showSearchColumnDropdown, setShowSearchColumnDropdown] = useState(false);
   
   // Form state for adding/editing stations
   const [formData, setFormData] = useState({
@@ -24,29 +28,39 @@ function DashboardFuelStation() {
 
   // Toggle the dropdown visibility
   const toggleDropdown = () => setDropdownVisible(!dropdownVisible);
+  
+  // Toggle search column dropdown
+  const toggleSearchColumnDropdown = () => setShowSearchColumnDropdown(!showSearchColumnDropdown);
 
   // Fetch fuel stations data
   useEffect(() => {
     fetchStations();
   }, []);
 
-  // Filter stations when search term or station data changes
+  // Filter stations when search term or search column changes
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredStationData(stationData);
     } else {
       const lowercasedSearch = searchTerm.toLowerCase();
       const filtered = stationData.filter(station => {
-        return (
-          station.station_id.toString().includes(lowercasedSearch) ||
-          station.station_name.toLowerCase().includes(lowercasedSearch) ||
-          station.location.toLowerCase().includes(lowercasedSearch) ||
-          (station.owner_id && station.owner_id.toString().includes(lowercasedSearch))
-        );
+        if (searchColumn === 'all') {
+          return (
+            station.station_id.toString().includes(lowercasedSearch) ||
+            station.station_name.toLowerCase().includes(lowercasedSearch) ||
+            station.location.toLowerCase().includes(lowercasedSearch) ||
+            (station.owner_id && station.owner_id.toString().includes(lowercasedSearch))
+          );
+        } else {
+          const fieldValue = station[searchColumn];
+          return fieldValue !== null && 
+                 fieldValue !== undefined && 
+                 String(fieldValue).toLowerCase().includes(lowercasedSearch);
+        }
       });
       setFilteredStationData(filtered);
     }
-  }, [searchTerm, stationData]);
+  }, [searchTerm, searchColumn, stationData]);
 
   const fetchStations = async () => {
     try {
@@ -74,6 +88,18 @@ function DashboardFuelStation() {
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+  };
+  
+  // Handle search column selection
+  const handleSearchColumnSelect = (column) => {
+    setSearchColumn(column);
+    setShowSearchColumnDropdown(false);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchColumn('all');
   };
 
   // Handle form input changes
@@ -169,6 +195,18 @@ function DashboardFuelStation() {
     setShowEditForm(true);
   };
 
+  // Get display name for search column
+  const getColumnDisplayName = (column) => {
+    switch (column) {
+      case 'station_id': return 'Station ID';
+      case 'station_name': return 'Station Name';
+      case 'location': return 'Location';
+      case 'owner_id': return 'Owner ID';
+      case 'all': return 'All Columns';
+      default: return column;
+    }
+  };
+
   return (
     <div className="container">
       {/* Profile Icon and Dropdown */}
@@ -211,17 +249,66 @@ function DashboardFuelStation() {
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className="search-container">
-          <div className="search">
-            <Search className="search-icon" />
-            <input
-              type="search"
-              className="search-input"
-              placeholder="Search by ID, name, location or owner..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
+        {/* Search Bar with Column Selection */}
+        <div className="table-search-container">
+          <div className="search-bar">
+            <div className="search-input-container">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              {searchTerm && (
+                <button className="clear-search-button" onClick={clearSearch}>
+                  ×
+                </button>
+              )}
+            </div>
+            <div className="search-column-selector">
+              <button 
+                className="column-selector-button" 
+                onClick={toggleSearchColumnDropdown}
+              >
+                {getColumnDisplayName(searchColumn)} <ChevronDown size={16} />
+              </button>
+              {showSearchColumnDropdown && (
+                <div className="column-dropdown">
+                  <div 
+                    className={`column-option ${searchColumn === 'all' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('all')}
+                  >
+                    All Columns
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'station_id' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('station_id')}
+                  >
+                    Station ID
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'station_name' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('station_name')}
+                  >
+                    Station Name
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'location' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('location')}
+                  >
+                    Location
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'owner_id' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('owner_id')}
+                  >
+                    Owner ID
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

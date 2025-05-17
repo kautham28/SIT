@@ -122,25 +122,31 @@
   font-size: 14px;
 }
 
-/* Search Container Styles */
-.search-container {
+/* Table Search Styles */
+.table-search-container {
   margin-bottom: 20px;
-  width: 100%;
 }
 
-.search {
-  position: relative;
-  width: 100%;
+.search-bar {
   display: flex;
   align-items: center;
-  border-radius: 50px;
-  background-color: #f5f7fa;
-  padding: 8px 16px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  gap: 10px;
+  width: 100%;
 }
 
-.search:focus-within {
+.search-input-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.search-input-container:focus-within {
   border-color: #45467c;
   box-shadow: 0 0 0 4px rgba(69, 70, 124, 0.1);
 }
@@ -150,22 +156,85 @@
   width: 20px;
   height: 20px;
   opacity: 0.7;
-  margin-right: 10px;
 }
 
 .search-input {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 10px 0;
+  padding: 12px;
   font-size: 16px;
   color: #333;
   outline: none;
-  width: 100%;
 }
 
 .search-input::placeholder {
   color: #999;
+}
+
+.clear-search-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.clear-search-button:hover {
+  color: #666;
+}
+
+.search-column-selector {
+  position: relative;
+}
+
+.column-selector-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #45467c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.column-selector-button:hover {
+  background-color: #393a66;
+}
+
+.column-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 180px;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.column-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.column-option:hover {
+  background-color: #f5f5f5;
+}
+
+.column-option.selected {
+  background-color: #e0f7fa;
+  color: #00796b;
+  font-weight: 500;
 }
 
 .dashboard-table {
