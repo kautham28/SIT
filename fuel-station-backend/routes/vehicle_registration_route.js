@@ -30,6 +30,113 @@ router.get('/test', (req, res) => {
   }
 });
 
+// Get all vehicle categories
+router.get('/categories', async (req, res) => {
+  try {
+    console.log('Fetching all vehicle categories');
+    
+    const [categories] = await db.query(
+      'SELECT category_id, category_name, category_description, fuel_quota FROM vehicle_categories ORDER BY category_name'
+    );
+    
+    console.log('Categories found:', categories.length);
+    
+    // Always return 200 status, even if no categories found
+    return res.status(200).json({
+      success: true,
+      message: categories.length > 0 ? 'Vehicle categories retrieved successfully' : 'No vehicle categories found',
+      categories: categories || []
+    });
+    
+  } catch (error) {
+    console.error('Error retrieving vehicle categories:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving vehicle categories',
+      error: error.message
+    });
+  }
+});
+
+// Get vehicles by owner ID
+router.get('/owner-vehicles/:ownerId', async (req, res) => {
+  const ownerId = req.params.ownerId;
+  
+  if (!ownerId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Owner ID is required'
+    });
+  }
+  
+  try {
+    const [vehicles] = await db.query(
+      `SELECT v.vehicle_id, v.registration_number, v.chassis, 
+              vc.category_id, vc.category_name, vc.fuel_quota
+       FROM vehicles v
+       JOIN vehicle_categories vc ON v.category_id = vc.category_id
+       WHERE v.vehicle_owner_id = ?`,
+      [ownerId]
+    );
+    
+    console.log(`Found ${vehicles.length} vehicles for owner ${ownerId}`);
+    
+    return res.status(200).json({
+      success: true,
+      message: vehicles.length > 0 ? 'Vehicles retrieved successfully' : 'No vehicles found for this owner',
+      vehicles: vehicles
+    });
+    
+  } catch (error) {
+    console.error('Error retrieving owner vehicles:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving vehicles',
+      error: error.message
+    });
+  }
+});
+
+// Get specific category by ID
+router.get('/categories/:id', async (req, res) => {
+  const categoryId = req.params.id;
+  
+  if (!categoryId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Category ID is required'
+    });
+  }
+  
+  try {
+    const [category] = await db.query(
+      'SELECT category_id, category_name, category_description, fuel_quota FROM vehicle_categories WHERE category_id = ?',
+      [categoryId]
+    );
+    
+    if (category.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Vehicle category not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Vehicle category retrieved successfully',
+      category: category[0]
+    });
+    
+  } catch (error) {
+    console.error('Error retrieving vehicle category:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving vehicle category',
+      error: error.message
+    });
+  }
+});
+
 // Middleware to validate required personal information
 const validatePersonalInfo = (req, res, next) => {
   const { firstName, lastName, nic, password, mobile, address } = req.body;
