@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Fuel, MapPin, User, Edit, Trash2, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Fuel, MapPin, User, Edit, Trash2, Plus, Search, ChevronDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import './DashboardFuelStation.css';
 
 function DashboardFuelStation() {
+  // Navigation hook for redirecting
+  const navigate = useNavigate();
+  
   // State for managing dropdown visibility and fuel stations data
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [stationData, setStationData] = useState([]);
+  const [filteredStationData, setFilteredStationData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [currentStation, setCurrentStation] = useState(null);
+  
+  // Search states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchColumn, setSearchColumn] = useState('all');
+  const [showSearchColumnDropdown, setShowSearchColumnDropdown] = useState(false);
   
   // Form state for adding/editing stations
   const [formData, setFormData] = useState({
@@ -22,11 +31,49 @@ function DashboardFuelStation() {
 
   // Toggle the dropdown visibility
   const toggleDropdown = () => setDropdownVisible(!dropdownVisible);
+  
+  // Toggle search column dropdown
+  const toggleSearchColumnDropdown = () => setShowSearchColumnDropdown(!showSearchColumnDropdown);
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear any auth tokens or user data from localStorage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    // Redirect to the login page at root path
+    navigate('/');
+  };
 
   // Fetch fuel stations data
   useEffect(() => {
     fetchStations();
   }, []);
+
+  // Filter stations when search term or search column changes
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredStationData(stationData);
+    } else {
+      const lowercasedSearch = searchTerm.toLowerCase();
+      const filtered = stationData.filter(station => {
+        if (searchColumn === 'all') {
+          return (
+            station.station_id.toString().includes(lowercasedSearch) ||
+            station.station_name.toLowerCase().includes(lowercasedSearch) ||
+            station.location.toLowerCase().includes(lowercasedSearch) ||
+            (station.owner_id && station.owner_id.toString().includes(lowercasedSearch))
+          );
+        } else {
+          const fieldValue = station[searchColumn];
+          return fieldValue !== null && 
+                 fieldValue !== undefined && 
+                 String(fieldValue).toLowerCase().includes(lowercasedSearch);
+        }
+      });
+      setFilteredStationData(filtered);
+    }
+  }, [searchTerm, searchColumn, stationData]);
 
   const fetchStations = async () => {
     try {
@@ -42,12 +89,30 @@ function DashboardFuelStation() {
       const data = await response.json();
       console.log("Fetched data:", data); // Debug log
       setStationData(data);
+      setFilteredStationData(data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err); // Debug log
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  // Handle search column selection
+  const handleSearchColumnSelect = (column) => {
+    setSearchColumn(column);
+    setShowSearchColumnDropdown(false);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchColumn('all');
   };
 
   // Handle form input changes
@@ -143,10 +208,17 @@ function DashboardFuelStation() {
     setShowEditForm(true);
   };
 
-  // Debug log to see what's in stationData
-  console.log("Current stationData:", stationData);
-  console.log("stationData length:", stationData.length);
-  console.log("stationData type:", typeof stationData);
+  // Get display name for search column
+  const getColumnDisplayName = (column) => {
+    switch (column) {
+      case 'station_id': return 'Station ID';
+      case 'station_name': return 'Station Name';
+      case 'location': return 'Location';
+      case 'owner_id': return 'Owner ID';
+      case 'all': return 'All Columns';
+      default: return column;
+    }
+  };
 
   return (
     <div className="container">
@@ -158,7 +230,7 @@ function DashboardFuelStation() {
         {dropdownVisible && (
           <div className="dropdown-menu">
             <Link to="/profile" className="dropdown-item">Profile</Link>
-            <Link to="/logout" className="dropdown-item">Logout</Link>
+            <button onClick={handleLogout} className="dropdown-item logout-button">Logout</button>
           </div>
         )}
       </div>
@@ -188,6 +260,69 @@ function DashboardFuelStation() {
           >
             <Plus size={16} /> Add Station
           </button>
+        </div>
+
+        {/* Search Bar with Column Selection */}
+        <div className="table-search-container">
+          <div className="search-bar">
+            <div className="search-input-container">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              {searchTerm && (
+                <button className="clear-search-button" onClick={clearSearch}>
+                  ×
+                </button>
+              )}
+            </div>
+            <div className="search-column-selector">
+              <button 
+                className="column-selector-button" 
+                onClick={toggleSearchColumnDropdown}
+              >
+                {getColumnDisplayName(searchColumn)} <ChevronDown size={16} />
+              </button>
+              {showSearchColumnDropdown && (
+                <div className="column-dropdown">
+                  <div 
+                    className={`column-option ${searchColumn === 'all' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('all')}
+                  >
+                    All Columns
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'station_id' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('station_id')}
+                  >
+                    Station ID
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'station_name' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('station_name')}
+                  >
+                    Station Name
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'location' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('location')}
+                  >
+                    Location
+                  </div>
+                  <div 
+                    className={`column-option ${searchColumn === 'owner_id' ? 'selected' : ''}`}
+                    onClick={() => handleSearchColumnSelect('owner_id')}
+                  >
+                    Owner ID
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Add Station Form */}
@@ -303,8 +438,8 @@ function DashboardFuelStation() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(stationData) && stationData.length > 0 ? (
-                stationData.map((station) => (
+              {Array.isArray(filteredStationData) && filteredStationData.length > 0 ? (
+                filteredStationData.map((station) => (
                   <tr key={station.station_id}>
                     <td>{station.station_id}</td>
                     <td>{station.station_name}</td>
@@ -328,7 +463,9 @@ function DashboardFuelStation() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="no-data">No fuel stations found</td>
+                  <td colSpan="5" className="no-data">
+                    {searchTerm ? 'No matching stations found' : 'No fuel stations found'}
+                  </td>
                 </tr>
               )}
             </tbody>
