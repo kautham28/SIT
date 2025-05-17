@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Fuel, MapPin, User, Edit, Trash2, Plus } from 'lucide-react';
+import { Fuel, MapPin, User, Edit, Trash2, Plus, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './DashboardFuelStation.css';
 
@@ -7,11 +7,13 @@ function DashboardFuelStation() {
   // State for managing dropdown visibility and fuel stations data
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [stationData, setStationData] = useState([]);
+  const [filteredStationData, setFilteredStationData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [currentStation, setCurrentStation] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Form state for adding/editing stations
   const [formData, setFormData] = useState({
@@ -28,6 +30,24 @@ function DashboardFuelStation() {
     fetchStations();
   }, []);
 
+  // Filter stations when search term or station data changes
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredStationData(stationData);
+    } else {
+      const lowercasedSearch = searchTerm.toLowerCase();
+      const filtered = stationData.filter(station => {
+        return (
+          station.station_id.toString().includes(lowercasedSearch) ||
+          station.station_name.toLowerCase().includes(lowercasedSearch) ||
+          station.location.toLowerCase().includes(lowercasedSearch) ||
+          (station.owner_id && station.owner_id.toString().includes(lowercasedSearch))
+        );
+      });
+      setFilteredStationData(filtered);
+    }
+  }, [searchTerm, stationData]);
+
   const fetchStations = async () => {
     try {
       setLoading(true);
@@ -42,12 +62,18 @@ function DashboardFuelStation() {
       const data = await response.json();
       console.log("Fetched data:", data); // Debug log
       setStationData(data);
+      setFilteredStationData(data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err); // Debug log
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   // Handle form input changes
@@ -143,11 +169,6 @@ function DashboardFuelStation() {
     setShowEditForm(true);
   };
 
-  // Debug log to see what's in stationData
-  console.log("Current stationData:", stationData);
-  console.log("stationData length:", stationData.length);
-  console.log("stationData type:", typeof stationData);
-
   return (
     <div className="container">
       {/* Profile Icon and Dropdown */}
@@ -188,6 +209,20 @@ function DashboardFuelStation() {
           >
             <Plus size={16} /> Add Station
           </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="search-container">
+          <div className="search">
+            <Search className="search-icon" />
+            <input
+              type="search"
+              className="search-input"
+              placeholder="Search by ID, name, location or owner..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
         </div>
 
         {/* Add Station Form */}
@@ -303,8 +338,8 @@ function DashboardFuelStation() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(stationData) && stationData.length > 0 ? (
-                stationData.map((station) => (
+              {Array.isArray(filteredStationData) && filteredStationData.length > 0 ? (
+                filteredStationData.map((station) => (
                   <tr key={station.station_id}>
                     <td>{station.station_id}</td>
                     <td>{station.station_name}</td>
@@ -328,7 +363,9 @@ function DashboardFuelStation() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="no-data">No fuel stations found</td>
+                  <td colSpan="5" className="no-data">
+                    {searchTerm ? 'No matching stations found' : 'No fuel stations found'}
+                  </td>
                 </tr>
               )}
             </tbody>
