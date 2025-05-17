@@ -4,7 +4,7 @@ import Home from './pages/Home/Home';
 import Registration from './pages/Registration/Registration';
 import Login from './pages/Login/Login';
 import QRpage from './pages/QRpage/QRpage';
-import Navbar from './components/Navbar';
+import Navbar from './Components/Navbar';
 import RegistrationSuccess from './pages/Registration/RegistrationSuccess';
 
 function App() {
