@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Fuel, MapPin, User, Edit, Trash2, Plus, Search, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './DashboardFuelStation.css';
 
 function DashboardFuelStation() {
+  // Navigation hook for redirecting
+  const navigate = useNavigate();
+  
   // State for managing dropdown visibility and fuel stations data
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [stationData, setStationData] = useState([]);
@@ -31,6 +34,16 @@ function DashboardFuelStation() {
   
   // Toggle search column dropdown
   const toggleSearchColumnDropdown = () => setShowSearchColumnDropdown(!showSearchColumnDropdown);
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear any auth tokens or user data from localStorage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    // Redirect to the login page at root path
+    navigate('/');
+  };
 
   // Fetch fuel stations data
   useEffect(() => {
@@ -217,7 +230,7 @@ function DashboardFuelStation() {
         {dropdownVisible && (
           <div className="dropdown-menu">
             <Link to="/profile" className="dropdown-item">Profile</Link>
-            <Link to="/logout" className="dropdown-item">Logout</Link>
+            <button onClick={handleLogout} className="dropdown-item logout-button">Logout</button>
           </div>
         )}
       </div>
