@@ -13,10 +13,142 @@ const ForgotPassword = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
- 
+  const handleForgotPasswordSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setMessage('');
+
+  // Prepare the data to send to the API
+  const userData = { email };
+
+  try {
+    // Make the API request
+    const response = await fetch('http://localhost:5000/api/admin_auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    // Parse the response
+    const data = await response.json();
+
+    if (response.ok) {
+      // Success case: API confirms email sent
+      setMessage(data.message || 'A reset code has been sent to your email.');
+      setStep(2); // Move to Verify Code step
+    } else {
+      // Error case: API returns an error (e.g., email not found)
+      setError(data.error || 'Failed to send reset code. Please try again.');
+    }
+  } catch (err) {
+    // Network or unexpected errors
+    setError('An error occurred. Please check your connection and try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const handleVerifyCodeSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setMessage('');
+
+  // Prepare the data to send to the API
+  const verificationData = { email, code };
+
+  try {
+    // Make the API request to verify the code
+    const response = await fetch('http://localhost:5000/api/admin_auth/verify-code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(verificationData),
+    });
+
+    // Parse the response
+    const data = await response.json();
+
+    if (response.ok) {
+      // Success case: Code is verified
+      setMessage(data.message || 'Code verified successfully.');
+      setStep(3); // Move to Reset Password step
+    } else {
+      // Error case: Invalid code or other API error
+      setError(data.error || 'Invalid code. Please try again.');
+    }
+  } catch (err) {
+    // Network or unexpected errors
+    setError('An error occurred. Please check your connection and try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const handleResetPasswordSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setMessage('');
+
+  // Client-side validation before API call
+  if (newPassword !== confirmPassword) {
+    setError('Passwords do not match.');
+    setLoading(false);
+    return;
+  } else if (newPassword.length < 6) {
+    setError('Password must be at least 6 characters long.');
+    setLoading(false);
+    return;
+  }
+
+  // Prepare the data to send to the API
+  const resetData = { email, code, newPassword };
+
+  try {
+    // Make the API request to reset the password
+    const response = await fetch('http://localhost:5000/api/admin_auth/reset-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(resetData),
+    });
+
+    // Parse the response
+    const data = await response.json();
+
+    if (response.ok) {
+      // Success case: Password reset successful
+      setMessage(data.message || 'Password reset successfully! Redirecting to login...');
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } else {
+      // Error case: API returns an error (e.g., invalid code, server issue)
+      setError(data.error || 'Failed to reset password. Please try again.');
+    }
+  } catch (err) {
+    // Network or unexpected errors
+    setError('An error occurred. Please check your connection and try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleBackToLogin = () => {
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   return (
@@ -54,10 +186,10 @@ const ForgotPassword = () => {
 
         {/* Step 1: Forgot Password - Email Input */}
         {step === 1 && (
-          <form className="form" >
+          <form className="form" onSubmit={handleForgotPasswordSubmit}>
             <div className="form-group">
               <div className="input-group">
-                <Mail className="input-icon" />
+                {/* <Mail className="input-icon" /> */}
                 <input
                   id="email"
                   name="email"
@@ -84,10 +216,10 @@ const ForgotPassword = () => {
 
         {/* Step 2: Verify Code */}
         {step === 2 && (
-          <form className="form">
+          <form className="form" onSubmit={handleVerifyCodeSubmit}>
             <div className="form-group">
               <div className="input-group">
-                <Check className="input-icon" />
+                {/* <Check className="input-icon" /> */}
                 <input
                   id="code"
                   name="code"
@@ -114,10 +246,10 @@ const ForgotPassword = () => {
 
         {/* Step 3: Reset Password */}
         {step === 3 && (
-          <form className="form" >
+          <form className="form" onSubmit={handleResetPasswordSubmit}>
             <div className="form-group">
               <div className="input-group">
-                <Lock className="input-icon" />
+                {/* <Lock className="input-icon" /> */}
                 <input
                   id="newPassword"
                   name="newPassword"
@@ -133,7 +265,7 @@ const ForgotPassword = () => {
 
             <div className="form-group">
               <div className="input-group">
-                <Lock className="input-icon" />
+                {/* <Lock className="input-icon" /> */}
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
