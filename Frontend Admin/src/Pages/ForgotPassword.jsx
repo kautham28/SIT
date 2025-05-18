@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { KeyRound, Mail, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import './Login-ForgotPassword.css';
+import { KeyRound, Mail, Lock, ArrowRight, Check } from 'lucide-react';
+import './Login-ForgotPassword.css'; // Assuming you have a separate CSS file for styling
 
-function ForgotPassword() {
+const ForgotPassword = () => {
+  // State to manage the current step (1: Forgot Password, 2: Verify Code, 3: Reset Password)
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-  const navigate = useNavigate();
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Password reset attempt', { email });
-    // Here you could send a request to your backend
-    // Store email in sessionStorage for other components
-    sessionStorage.setItem('resetEmail', email);
-    navigate('/verify-code');
+ 
+
+  const handleBackToLogin = () => {
+    window.location.href = '/login';
   };
 
   return (
@@ -23,43 +26,140 @@ function ForgotPassword() {
           <div className="icon-container">
             <KeyRound className="icon" />
           </div>
-          <h2 className="title">Reset Password</h2>
-          <p className="subtitle">Enter your email to reset password</p>
+          <h2 className="title">
+            {step === 1 ? 'Reset Password' : step === 2 ? 'Verify Code' : 'Set New Password'}
+          </h2>
+          <p className="subtitle">
+            {step === 1
+              ? 'Enter your email to reset password'
+              : step === 2
+              ? 'Enter the code sent to your email'
+              : 'Enter your new password'}
+          </p>
         </div>
 
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <div className="input-group">
-              <Mail className="input-icon" />
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                placeholder="Email address"
-              />
-            </div>
+        {/* Display success message if available */}
+        {message && (
+          <div className="success-message" style={{ color: 'green', margin: '10px 0', textAlign: 'center' }}>
+            {message}
           </div>
+        )}
 
-          <button type="submit" className="submit-button">
-            <span>Reset Password</span>
-            <ArrowRight className="button-icon" />
-          </button>
+        {/* Display error message if available */}
+        {error && (
+          <div className="error-message" style={{ color: 'red', margin: '10px 0', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
 
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="forgot-password"
-          >
-            Back to login
-          </button>
-        </form>
+        {/* Step 1: Forgot Password - Email Input */}
+        {step === 1 && (
+          <form className="form" >
+            <div className="form-group">
+              <div className="input-group">
+                <Mail className="input-icon" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input"
+                  placeholder="Email address"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="submit-button" disabled={loading}>
+              <span>{loading ? 'Sending...' : 'Reset Password'}</span>
+              <ArrowRight className="button-icon" />
+            </button>
+
+            <button type="button" onClick={handleBackToLogin} className="forgot-password">
+              Back to login
+            </button>
+          </form>
+        )}
+
+        {/* Step 2: Verify Code */}
+        {step === 2 && (
+          <form className="form">
+            <div className="form-group">
+              <div className="input-group">
+                <Check className="input-icon" />
+                <input
+                  id="code"
+                  name="code"
+                  type="text"
+                  required
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="input"
+                  placeholder="Verification Code"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="submit-button" disabled={loading}>
+              <span>{loading ? 'Verifying...' : 'Verify Code'}</span>
+              <ArrowRight className="button-icon" />
+            </button>
+
+            <button type="button" onClick={() => setStep(1)} className="forgot-password">
+              Back to Email
+            </button>
+          </form>
+        )}
+
+        {/* Step 3: Reset Password */}
+        {step === 3 && (
+          <form className="form" >
+            <div className="form-group">
+              <div className="input-group">
+                <Lock className="input-icon" />
+                <input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="input"
+                  placeholder="New Password"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="input-group">
+                <Lock className="input-icon" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="input"
+                  placeholder="Confirm Password"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="submit-button" disabled={loading}>
+              <span>{loading ? 'Resetting...' : 'Set New Password'}</span>
+              <ArrowRight className="button-icon" />
+            </button>
+
+            <button type="button" onClick={() => setStep(2)} className="forgot-password">
+              Back to Verify Code
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default ForgotPassword;
