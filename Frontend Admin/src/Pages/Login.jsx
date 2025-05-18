@@ -70,10 +70,10 @@ function Login() {
 
         {error && <div className="error-message">{error}</div>}
 
-        <form className="form" onSubmit={handleSubmit}>
+         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <div className="input-group">
-              <Mail className="input-icon" />
+            <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Mail style={{ color: '#888' }} />
               <input
                 id="username"
                 name="username"
@@ -84,11 +84,12 @@ function Login() {
                 className="input"
                 placeholder="Username"
                 disabled={loading}
+                style={{ flex: 1 }}
               />
             </div>
 
-            <div className="input-group">
-              <Lock className="input-icon" />
+            <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
+              <Lock style={{ color: '#888' }} />
               <input
                 id="password"
                 name="password"
@@ -99,6 +100,7 @@ function Login() {
                 className="input"
                 placeholder="Password"
                 disabled={loading}
+                style={{ flex: 1 }}
               />
             </div>
           </div>

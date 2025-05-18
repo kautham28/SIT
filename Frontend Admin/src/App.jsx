@@ -14,8 +14,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-code" element={<VerifyCode />} />
-        <Route path="/new-password" element={<NewPassword />} />
 
         <Route path="/FuelDash" element={<DashboardFuelStation />} />
         <Route path="/OwnerDash" element={<Dashboard />} />
