@@ -4,6 +4,11 @@ const router = express.Router();
 const db = require('../../fuel-station-backend/src/config/db.js');  // The database connection you defined
 const jwt = require('jsonwebtoken');
 // const verifyAdminToken = require('../middleware/adminauthmiddleware');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 // Admin login route
 router.post('/login', async (req, res) => {
