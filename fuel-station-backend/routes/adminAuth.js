@@ -127,4 +127,64 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+// Verify Reset Code Route (POST)
+router.post('/verify-code', async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ success: false, error: 'Email and code are required' });
+    }
+
+    // Check if the code matches and hasn't expired
+    const [rows] = await db.query(
+      'SELECT * FROM users WHERE email = ? AND reset_code = ? AND reset_token_expires > NOW()',
+      [email, code]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired code' });
+    }
+
+    res.status(200).json({ success: true, message: 'Code verified successfully', token: rows[0].reset_token });
+  } catch (error) {
+    console.error('Error verifying reset code:', error);
+    res.status(500).json({ success: false, error: 'Internal server error. Please try again.' });
+  }
+});
+
+// Reset Password Route (POST)
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({ success: false, error: 'Email, code, and new password are required' });
+    }
+
+    // Check if the token is valid and hasn't expired
+    const [rows] = await db.query(
+      'SELECT * FROM users WHERE email = ? AND reset_code = ? AND reset_token_expires > NOW()',
+      [email, code]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired code' });
+    }
+
+    // Store the new password in plain text (NOT RECOMMENDED FOR PRODUCTION)
+    await db.query(
+      'UPDATE users SET password = ?, reset_code = NULL, reset_token_expires = NULL WHERE email = ?',
+      [newPassword, email]
+    );
+
+    console.log('Password updated successfully for email:', newPassword);
+
+    res.status(200).json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ success: false, error: 'Internal server error. Please try again.' });
+  }
+});
+
 module.exports = router;
