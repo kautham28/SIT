@@ -77,4 +77,39 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+
+router.post('/login-operator', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const [rows] = await db.query(
+      'SELECT * FROM users WHERE username = ? AND password = ? AND role = ?',
+      [username, password, 'fuel_station_operator']
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Invalid credentials or role' });
+    }
+
+    const user = rows[0];
+    delete user.password;
+
+    const [rows2] = await db.query(
+      'SELECT * FROM fuel_station_operators WHERE user_id = ?',
+      [user.user_id]
+    );
+
+    const operator = rows2[0] || null;
+
+    res.status(200).json({
+      message: 'Login successful',
+      user,
+      operator,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Login failed' });
+  }
+});
+
 module.exports = router;

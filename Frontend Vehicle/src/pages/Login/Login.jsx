@@ -36,6 +36,7 @@ const Login = () => {
 
       if (response.data.success) {
         // Store authentication token and user info
+        localStorage.setItem('vehId',registrationNumber)
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
