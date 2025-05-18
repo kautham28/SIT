@@ -4,8 +4,6 @@ import Login from '../src/Pages/Login';
 import ForgotPassword from '../src/Pages/ForgotPassword';
 import DashboardFuelStation from './Pages/DashboardFuelStation';
 import Dashboard from './Pages/OwnerDash';
-import VerifyCode from './Pages/VerifyCode';
-import NewPassword from './Pages/NewPassword';
 
 
 function App() {

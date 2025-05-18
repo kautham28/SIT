@@ -1,47 +1,96 @@
 import React, { useState, useEffect } from "react";
-import "./Verify.css"; // Import the CSS file for styling
+import { useNavigate } from "react-router-dom";
+import "./Verify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 const VerifyAccount = () => {
   const [code, setCode] = useState(new Array(6).fill(""));
-  const [timer, setTimer] = useState(30); // 30-second timer
+  const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const email = sessionStorage.getItem("resetEmail");
 
   useEffect(() => {
+    if (!email) {
+      navigate("/forgot-password");
+      return;
+    }
     if (timer > 0) {
       const interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
       return () => clearInterval(interval);
     } else {
-      setCanResend(true); // Allow resend after timer ends
+      setCanResend(true);
     }
-  }, [timer]);
+  }, [timer, navigate, email]);
 
   const handleChange = (value, index) => {
     const newCode = [...code];
-    newCode[index] = value.slice(0, 1); // Ensure only one character is entered
+    newCode[index] = value.slice(0, 1);
     setCode(newCode);
 
-    // Automatically focus the next input box
     if (value && index < 5) {
       document.getElementById(`code-input-${index + 1}`).focus();
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setMessage("");
     const verificationCode = code.join("");
-    console.log("Verification code submitted:", verificationCode);
-    // Add logic to handle verification
+
+    try {
+      const response = await fetch("http://localhost:5000/api/fuel_stations/verify-code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code: verificationCode }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message);
+        setTimeout(() => navigate(`/new-password?code=${verificationCode}&email=${email}`), 2000);
+      } else {
+        setError(data.error || "Invalid or expired code. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error verifying code:", err);
+      setError("An error occurred. Please try again.");
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (canResend) {
-      console.log("Resend verification code");
-      setTimer(30); // Reset the timer
-      setCanResend(false); // Disable resend until timer ends
+      try {
+        const response = await fetch("http://localhost:5000/api/fuel_stations/forgot-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setMessage("A new reset code has been sent to your email.");
+          setTimer(30);
+          setCanResend(false);
+        } else {
+          setError(data.error || "Failed to resend code. Please try again.");
+        }
+      } catch (err) {
+        console.error("Error resending code:", err);
+        setError("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -54,6 +103,8 @@ const VerifyAccount = () => {
         <p className="verify-account-instructions">
           Enter the 6-digit verification code sent to your email.
         </p>
+        {message && <p className="success-message">{message}</p>}
+        {error && <p className="error-message">{error}</p>}
         <div className="verification-code-container">
           {code.map((digit, index) => (
             <input
@@ -67,7 +118,6 @@ const VerifyAccount = () => {
             />
           ))}
         </div>
-      
         <button type="submit" className="verify-account-button">
           Verify
         </button>
