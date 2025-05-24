@@ -20,7 +20,7 @@ const RegistrationSuccess = () => {
           <div className="registration-details">
             <h2>Registration Details</h2>
             <p><strong>Vehicle Number:</strong> {registrationData.registrationNumber}</p>
-            <p><strong>Fuel Quota:</strong> {registrationData.fuelQuota} liters</p>
+            <p><strong>Fuel Quota:</strong> 40.000 liters</p>
             <p><strong>Category ID:</strong> {registrationData.categoryId}</p>
           </div>
         )}
