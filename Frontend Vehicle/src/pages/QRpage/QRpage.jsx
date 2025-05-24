@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./QRpage.css";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -29,7 +29,7 @@ const QRpage = () => {
 
       const link = document.createElement("a");
       link.href = imgURI;
-      link.download = `qr.png`;
+      link.download = "qr.png";  // Fixed file name for download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -38,16 +38,42 @@ const QRpage = () => {
     img.src = url;
   };
 
+  const [eligibleQuota, setEligibleQuota] = useState(0.0);
+  const [balanceQuota, setBalanceQuota] = useState(0.0);
+
+  const vehId = localStorage.getItem("vehId");
+
+  useEffect(() => {
+    const fetchQuota = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/vehicles/number/${vehId}`);
+        if (!response.ok) throw new Error("Failed to fetch vehicle data");
+
+        const data = await response.json();
+        setEligibleQuota(data.eligibleWeeklyQuota || 0.0);
+        setBalanceQuota(data.fuel_quota); // Set the balance quota here
+      } catch (error) {
+        console.error("Error fetching quota:", error);
+      }
+    };
+
+    if (vehId) {
+      fetchQuota();
+    } else {
+      console.error("Vehicle ID not found in localStorage");
+    }
+  }, [vehId]);
+
   return (
     <div className="QR-container">
       <h2>National Fuel Pass</h2>
 
       <div className="QR-details">
         <div>
-          <strong>Eligible Weekly Quota:</strong> 0.000 L
+          <strong>Eligible Weekly Quota:</strong> 40 L
         </div>
         <div>
-          <strong>Balance Weekly Quota:</strong> 0.000 L
+          <strong>Balance Weekly Quota:</strong> {balanceQuota} L
         </div>
       </div>
 
